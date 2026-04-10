@@ -1,0 +1,734 @@
+import { useRef, useEffect, useState } from 'react'
+import { motion, useInView, useScroll, useTransform, useMotionValue, animate, AnimatePresence } from 'framer-motion'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Lenis from 'lenis'
+import DrawCanvas from './components/DrawCanvas'
+import Cursor from './components/Cursor'
+import heroImg from './assets/hero.jpg'
+import childhoodImg from './assets/childhood.jpg'
+import cricketImg from './assets/cricket.jpg'
+import injuryImg from './assets/injury.png'
+import plottwistImg from './assets/plottwist.jpg'
+import presentImg from './assets/present.jpg'
+
+gsap.registerPlugin(ScrollTrigger)
+
+/* ═══ SMOOTH SCROLL ═══ */
+function useSmoothScroll() {
+  useEffect(() => {
+    const lenis = new Lenis({ duration: 1.2, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true })
+    lenis.on('scroll', ScrollTrigger.update)
+    gsap.ticker.add(time => lenis.raf(time * 1000))
+    gsap.ticker.lagSmoothing(0)
+    return () => { lenis.destroy(); gsap.ticker.remove(lenis.raf) }
+  }, [])
+}
+
+const blue = 'var(--color-blue)'
+const dk = 'var(--color-dark)'
+const lt = 'var(--color-light)'
+
+/* ═══ UTILS ═══ */
+function R({ children, className = '', delay = 0 }) {
+  const ref = useRef(null)
+  const v = useInView(ref, { once: true, margin: '-60px' })
+  return <motion.div ref={ref} initial={{ opacity: 0, y: 28 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 1, 0.5, 1] }} className={className}>{children}</motion.div>
+}
+
+function Counter({ target, suffix = '+' }) {
+  const ref = useRef(null); const v = useInView(ref, { once: true }); const mv = useMotionValue(0); const [d, setD] = useState('0')
+  useEffect(() => { if (!v) return; const c = animate(mv, target, { duration: 2, ease: 'easeOut', onUpdate: x => setD(Math.floor(x).toString()) }); return c.stop }, [v, target, mv])
+  return <span ref={ref}>{d}{suffix}</span>
+}
+
+/* ═══ HORIZONTAL STORY ═══ */
+function StorySection() {
+  const cRef = useRef(null), tRef = useRef(null)
+  const panels = [
+    { year: '1999', title: 'BORN.', content: <>Born into a proud family.<br />Some said, "Mera beta doctor banega."<br />Some said, "Engineer."<br />Everyone had plans for me.<br />But me? no idea</>, img: childhoodImg, realImg: true },
+    { year: '2011', title: 'THE DREAM.', content: <>"India lifted the World Cup after 28 years."<br />That moment… damn, goosebumps.<br />And I still remember, Sachin sir said in the post-match presentation:<br /><span className="font-700" style={{ color: '#3B82F6' }}>"Chase your dreams, because dreams do come true."</span><br />Those words stayed with me. That's when I saw my dream —<br />to play for India, wearing that blue jersey.</>, img: cricketImg, realImg: true },
+    { year: '2019', title: 'THE INJURY.', content: <>Everything was going good… until that black day.<br />Rainy season. Practice.<br />Years of hard work gone in a moment.<br /><br />That day… something didn't just break.<br />It ended.</>, img: injuryImg, realImg: true, zoom: 1.4, pos: 'center 60%' },
+    { year: '2019', title: 'THE PLOT TWIST.', accent: true, content: <>I'm a very ambitious person.<br />I don't quit. Because I believe — <span className="font-700" style={{ color: '#3B82F6' }}>अंतः अस्ति प्रारंभः</span><br />So I shifted my practice…<br />from the cricket ground to Photoshop.<br />Same dedication. Same curiosity.<br />Same obsession to get better.</>, img: plottwistImg, realImg: true },
+    { year: 'Present', title: 'NEW INNINGS.', content: <>I didn't become what I planned.<br />I became what I was meant to be.<br />From swinging the ball to building brands.<br />From wearing spikes to creating identities.<br />This wasn't a backup plan.<br /><br /><span className="font-700" style={{ color: '#3B82F6' }}>It's God's plan, baby.</span><br /><br />A professional cricketer who became a graphic designer.</>, img: presentImg, realImg: true, zoom: 1.2, pos: '40% 25%' },
+  ]
+
+  const [activePanel, setActivePanel] = useState(0)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const track = tRef.current; if (!track) return
+      const scrollDist = track.scrollWidth - window.innerWidth
+      const end = () => '+=' + (scrollDist + window.innerHeight * 0.5)
+      gsap.to(track, { x: -scrollDist, ease: 'none', scrollTrigger: { trigger: cRef.current, pin: true, anticipatePin: 1, scrub: 1, end, invalidateOnRefresh: true,
+        onUpdate: (self) => { setActivePanel(Math.round(self.progress * (panels.length - 1))) }
+      } })
+    }, cRef)
+    return () => ctx.revert()
+  }, [panels.length])
+
+  return (
+    <section ref={cRef} className="relative overflow-hidden bg-[var(--color-light)] text-[var(--color-dark)]">
+      {/* Timeline with dots */}
+      <div className="absolute bottom-8 left-[10%] right-[10%] z-20">
+        {/* Line */}
+        <div className="absolute top-1/2 left-0 right-0 h-px bg-black/8 -translate-y-1/2" />
+        {/* Year labels + dots */}
+        <div className="flex justify-between items-center relative">
+          {panels.map((p, i) => (
+            <div key={i} className="flex flex-col items-center gap-2">
+              <span className={`text-[0.6rem] font-500 tracking-[0.2em] transition-all duration-400 ${activePanel === i ? 'opacity-80' : 'opacity-30'}`} style={activePanel === i ? { color: '#3B82F6' } : {}}>{p.year}</span>
+              <div className={`w-3 h-3 rounded-full border-2 transition-all duration-400 ${activePanel === i ? 'border-[#3B82F6] bg-[#3B82F6] scale-125' : 'border-black/15 bg-transparent'}`} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div ref={tRef} className="flex w-max h-screen">
+        {panels.map((p, i) => (
+          <div key={i} className="h-screen flex items-center shrink-0 px-12 md:px-16" style={{ width: '90vw' }}>
+            <div className="max-w-4xl mx-auto w-full flex gap-14 items-center">
+              <div className="flex-1 min-w-0">
+                <p className="text-[6rem] md:text-[8rem] leading-none font-700 select-none tracking-tight opacity-10">{p.year}</p>
+                <h2 className="text-2xl md:text-4xl font-700 leading-tight mt-3 whitespace-pre-line" style={{ color: '#3B82F6' }}>{p.title}</h2>
+                <p className="text-sm md:text-base leading-relaxed mt-5 max-w-md" style={{ color: 'rgba(0,0,0,0.45)' }}>{p.content}</p>
+              </div>
+              {p.img && <div className="hidden md:block w-72 shrink-0 overflow-hidden rounded-2xl">
+                {p.realImg
+                  ? <img src={p.img} alt="" className="aspect-[3/4] w-full object-cover grayscale" style={{ transform: p.zoom ? `scale(${p.zoom})` : undefined, objectPosition: p.pos || 'center top' }} />
+                  : <div className="aspect-[3/4] rounded-2xl flex items-center justify-center text-xs opacity-15 bg-[var(--color-dark)] text-[var(--color-light)]">{p.img}</div>
+                }
+              </div>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ═══ CRAFT — spotlight on hover ═══ */
+function CraftSection() {
+  const [h, setH] = useState(null)
+  const ref = useRef(null), v = useInView(ref, { once: true, margin: '-80px' })
+  const lines = ['I SHOOT.', 'I EDIT.', 'I DESIGN.', 'I VIBE CODE.']
+
+  const getOpacity = (i) => {
+    if (!v) return 0
+    if (h === null) return 0.15  // all dim by default
+    return h === i ? 1 : 0.04   // hovered = bright, rest = nearly invisible
+  }
+
+  const getColor = (i) => {
+    if (i === 3) return h === 3 ? 'var(--color-blue)' : 'rgba(59,130,246,0.15)'
+    return h === i ? '#ffffff' : 'rgba(255,255,255,0.15)'
+  }
+
+  return (
+    <section ref={ref} className="min-h-screen flex items-center py-24 bg-[var(--color-dark)] relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-10 w-full relative z-10" onMouseLeave={() => setH(null)}>
+        {lines.map((l, i) => (
+          <motion.h2 key={i}
+            className="font-700 leading-[0.88] cursor-default select-none"
+            style={{
+              fontSize: 'clamp(3rem, 12vw, 9rem)',
+              color: getColor(i),
+              textShadow: h === i ? (i === 3 ? '0 0 60px rgba(59,130,246,0.3)' : '0 0 60px rgba(255,255,255,0.15)') : 'none',
+              transition: 'color 0.4s, text-shadow 0.4s, opacity 0.4s',
+            }}
+            initial={{ opacity: 0, filter: 'blur(16px)', y: 20 }}
+            animate={v ? { opacity: getOpacity(i), filter: 'blur(0px)', y: 0 } : {}}
+            transition={{ duration: 0.7, delay: i * 0.1, ease: [0.25, 1, 0.5, 1] }}
+            onMouseEnter={() => setH(i)}
+          >{l}</motion.h2>
+        ))}
+        <motion.p className="text-sm mt-8 opacity-10" initial={{ opacity: 0 }} animate={v ? { opacity: 0.1 } : {}} transition={{ delay: 0.7 }}>that's not a resume. that's a tuesday.</motion.p>
+      </div>
+    </section>
+  )
+}
+
+/* ═══ TOOLS ═══ */
+const tools = [
+  { name: 'Photoshop', abbr: 'Ps', color: '#31A8FF' },
+  { name: 'Illustrator', abbr: 'Ai', color: '#FF9A00' },
+  { name: 'After Effects', abbr: 'Ae', color: '#9999FF' },
+  { name: 'Premiere Pro', abbr: 'Pr', color: '#9999FF' },
+  { name: 'Figma', abbr: 'Fg', color: '#A259FF' },
+  { name: 'InDesign', abbr: 'Id', color: '#FF3366' },
+]
+const aiTools = [
+  { name: 'Claude', icon: '🤖' },
+  { name: 'ChatGPT', icon: '💬' },
+  { name: 'Gemini', icon: '✨' },
+  { name: 'Higgsfield', icon: '🎬' },
+  { name: 'Midjourney', icon: '🎨' },
+]
+
+/* ═══ FLOATING SCATTERED QUOTES ═══ */
+function FloatingQuotesSection() {
+  const ref = useRef(null), v = useInView(ref, { once: true, margin: '-50px' })
+
+  const cards = [
+    { text: '"The magic you\'re looking for is in the work you\'re avoiding."', accent: '#3B82F6' },
+    { text: '"Life is this 🤚... but I like this 🤚"', sub: '— Harvey Specter', accent: '#F59E0B' },
+    { text: '"Kahi par pahuchne ke liye, kahin se niklana padta hai."', accent: '#10B981' },
+    { text: '"I didn\'t come this far, to only come this far."', accent: '#EF4444' },
+    { text: '"Design is not just what it looks like. Design is how it works."', sub: '— Steve Jobs', accent: '#8B5CF6' },
+    { text: '"Sapne wo nahi jo neend mein aaye, sapne wo hain jo neend nahi aane dein."', sub: '— APJ Abdul Kalam', accent: '#EC4899' },
+    { text: '"First they ignore you, then they laugh at you, then they fight you, then you win."', accent: '#06B6D4' },
+    { text: '"Manzil unhi ko milti hai, jinke sapno mein jaan hoti hai."', accent: '#F97316' },
+  ]
+
+  // Scattered positions — overlapping, rotated, like dropped cards
+  const layouts = [
+    { top: '5%', left: '2%', rotate: -4, z: 1, w: '340px' },
+    { top: '2%', left: '55%', rotate: 2, z: 3, w: '320px' },
+    { top: '22%', left: '25%', rotate: -1.5, z: 5, w: '350px' },
+    { top: '18%', left: '60%', rotate: 3, z: 2, w: '300px' },
+    { top: '42%', left: '5%', rotate: 1.5, z: 4, w: '330px' },
+    { top: '40%', left: '50%', rotate: -3, z: 6, w: '340px' },
+    { top: '62%', left: '15%', rotate: 2.5, z: 7, w: '320px' },
+    { top: '60%', left: '55%', rotate: -2, z: 8, w: '310px' },
+  ]
+
+  return (
+    <section ref={ref} className="relative overflow-hidden" style={{ minHeight: '120vh', background: 'linear-gradient(180deg, #0a0a0a 0%, #060a12 100%)' }}>
+      <div className="absolute inset-0">
+        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #3B82F6, transparent 70%)' }} />
+        <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full opacity-[0.02]" style={{ background: 'radial-gradient(circle, #8B5CF6, transparent 70%)' }} />
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-10 pt-24 pb-10 text-center">
+        <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-15 mb-3">THINGS I BELIEVE IN</p></R>
+        <R delay={0.05}><p className="text-xs opacity-10 mb-6">quotes, shers, and borrowed wisdom.</p></R>
+      </div>
+
+      {/* Floating cards — pop from bottom on scroll */}
+      <div className="relative max-w-6xl mx-auto px-10" style={{ height: '85vh' }}>
+        {cards.map((card, i) => {
+          const l = layouts[i]
+          return (
+            <motion.div
+              key={i}
+              className="absolute group cursor-default"
+              style={{ top: l.top, left: l.left, width: l.w, zIndex: l.z, maxWidth: 'calc(100% - 40px)' }}
+              initial={{ opacity: 0, y: 200, rotate: l.rotate * 3, scale: 0.7 }}
+              whileInView={{ opacity: 1, y: 0, rotate: l.rotate, scale: 1 }}
+              viewport={{ once: true, margin: '-10%' }}
+              transition={{ duration: 0.9, delay: i * 0.06, type: 'spring', stiffness: 80, damping: 15 }}
+              whileHover={{ y: -12, rotate: 0, scale: 1.06, zIndex: 20, transition: { type: 'spring', stiffness: 300, damping: 18 } }}
+            >
+              <div className="rounded-2xl p-5 backdrop-blur-sm border border-white/[0.06] shadow-2xl transition-shadow duration-500 group-hover:shadow-[0_25px_70px_rgba(0,0,0,0.5)]"
+                style={{ background: `linear-gradient(135deg, ${card.accent}08, ${card.accent}04)` }}>
+                <div className="w-2 h-2 rounded-full mb-3 opacity-60" style={{ background: card.accent }} />
+                <p className="font-400 leading-relaxed text-white/50 group-hover:text-white/80 transition-colors duration-400" style={{ fontSize: '12px' }}>{card.text}</p>
+                {card.sub && <p className="mt-2 text-white/20 group-hover:text-white/40 transition-colors" style={{ fontSize: '10px' }}>{card.sub}</p>}
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
+/* ═══ SHAYARI ═══ */
+function ShayariSection() {
+  const shers = [
+    { text: 'ख्वाब तो आँखों में है अब भी\nफिर भी उनकी ताबीरों से दिल डरता है\n\nथके हुए पल, डरे हुए दिल, दुखी हुई आँखों से कह दो\nऔर कोई अब ख्वाब ना देखें', author: '— अशफ़ाक़ हुसैन' },
+    { text: 'दिन कुछ ऐसे गुज़ारता है कोई\nजैसे एहसाँ उतारता है कोई\n\nआइना देख कर तसल्ली हुई\nहम को इस घर में जानता है कोई', author: '— गुलज़ार' },
+    { text: 'One more — because good things come in threes. Your voice, your ink, your fire.', author: null },
+  ]
+
+  return (
+    <div className="mb-20">
+      <R><p className="text-xs font-500 tracking-[0.2em] mb-8" style={{ color: blue }}>WORDS THAT KEPT ME UP</p></R>
+      <div className="grid md:grid-cols-3 gap-4">
+        {shers.map((s, i) => (
+          <R key={i} delay={i * 0.08}>
+            <motion.div
+              className="hover-target group relative p-8 rounded-2xl border border-white/[0.04] overflow-hidden cursor-default"
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute top-4 left-4 text-5xl font-700 opacity-[0.03] select-none">"</div>
+              <p className="font-300 leading-relaxed opacity-30 group-hover:opacity-60 transition-opacity duration-500 relative z-10 whitespace-pre-line" style={{ fontSize: '12px' }}>{s.text}</p>
+              {s.author && <p className="font-400 opacity-15 mt-4 relative z-10" style={{ fontSize: '12px' }}>{s.author}</p>}
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--color-blue)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </motion.div>
+          </R>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ═══ TESTIMONIALS — stacked rotating cards ═══ */
+function TestimonialSection() {
+  const testimonials = [
+    { text: '"Virat has an incredible eye for design. He transformed our brand identity and the results were beyond what we imagined."', name: 'Client Name', role: 'CEO, Company' },
+    { text: '"Working with Virat was seamless. He understands the vision quickly and delivers designs that truly speak to the audience."', name: 'Client Name', role: 'Marketing Head, Brand' },
+    { text: '"From concept to execution, Virat brought a level of creativity and professionalism that\'s rare to find. Highly recommend."', name: 'Client Name', role: 'Founder, Startup' },
+    { text: '"The brand identity Virat created for us elevated our entire business. Clients started taking us more seriously overnight."', name: 'Client Name', role: 'Director, Agency' },
+    { text: '"Virat doesn\'t just design — he tells stories through visuals. Every project felt personal and intentional."', name: 'Client Name', role: 'Co-founder, Studio' },
+  ]
+
+  const [current, setCurrent] = useState(0)
+  const dir = useRef(0)
+
+  return (
+    <section className="py-28 bg-[var(--color-light)] text-[var(--color-dark)] overflow-hidden">
+      <div className="max-w-4xl mx-auto px-10 text-center">
+        <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-25 mb-3">TESTIMONIALS</p></R>
+        <R delay={0.05}><h2 className="text-2xl md:text-4xl font-700 mb-2">What others say about Virat</h2></R>
+        <R delay={0.1}><p className="text-sm opacity-35 mb-16">you don't have to trust our word.</p></R>
+
+        <div className="relative h-[280px] flex items-center justify-center">
+          <div className="absolute w-[90%] max-w-lg h-[220px] bg-white/40 rounded-2xl rotate-2 top-1/2 -translate-y-1/2 shadow-sm" style={{ zIndex: 1 }} />
+          <div className="absolute w-[85%] max-w-lg h-[210px] bg-white/60 rounded-2xl -rotate-1 top-1/2 -translate-y-1/2 shadow-sm" style={{ zIndex: 2 }} />
+
+          <AnimatePresence initial={false} custom={dir.current}>
+            <motion.div
+              key={current}
+              custom={dir.current}
+              initial={(d) => ({ x: d > 0 ? 450 : -450, rotate: d > 0 ? 15 : -15, opacity: 0 })}
+              animate={{ x: 0, rotate: 0, opacity: 1 }}
+              exit={(d) => ({ x: d > 0 ? -450 : 450, rotate: d > 0 ? -15 : 15, opacity: 0 })}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute w-[95%] max-w-lg bg-white rounded-2xl shadow-xl p-8 md:p-10 text-left"
+              style={{ zIndex: 10 }}
+            >
+              <p className="text-base md:text-lg font-400 leading-relaxed text-[var(--color-dark)]">{testimonials[current].text}</p>
+              <div className="flex items-center gap-3 mt-6">
+                <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-xs font-600 opacity-40">{testimonials[current].name.charAt(0)}</div>
+                <div>
+                  <p className="text-sm font-600">{testimonials[current].name}</p>
+                  <p className="text-xs opacity-40">{testimonials[current].role}</p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Buttons outside the card container — no z-index conflicts */}
+        <div className="flex items-center justify-center gap-6 mt-6" role="navigation">
+          <div className="w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center text-lg border border-black/5 hover:scale-110 active:scale-95 transition-all select-none"
+            role="button" tabIndex={0}
+            onMouseDown={() => { dir.current = -1; setCurrent(c => (c - 1 + testimonials.length) % testimonials.length) }}>‹</div>
+
+          <div className="flex gap-2">
+            {testimonials.map((_, i) => (
+              <div key={i} role="button" tabIndex={0}
+                onMouseDown={() => { dir.current = i > current ? 1 : -1; setCurrent(i) }}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === current ? 'bg-[var(--color-blue)] w-6' : 'bg-black/10 w-2'}`} />
+            ))}
+          </div>
+
+          <div className="w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center text-lg border border-black/5 hover:scale-110 active:scale-95 transition-all select-none"
+            role="button" tabIndex={0}
+            onMouseDown={() => { dir.current = 1; setCurrent(c => (c + 1) % testimonials.length) }}>›</div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══ PRELOADER — minimal line ═══ */
+/* ═══ HERO — GSAP-driven: quote clear on load → exits → intro slides in ═══ */
+function HeroSection() {
+  const containerRef = useRef(null)
+  const quoteRef = useRef(null)
+  const introRef = useRef(null)
+  const photoRef = useRef(null)
+  const scrollCueRef = useRef(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          pin: true,
+          anticipatePin: 1,
+          scrub: 1,
+          start: 'top top',
+          end: '+=250%',
+        }
+      })
+
+      // Scroll cue: fades out immediately
+      tl.to(scrollCueRef.current, { opacity: 0, duration: 0.05 }, 0)
+
+      // Quote: holds 0–0.15, then fully exits 0.15–0.35
+      tl.to(quoteRef.current, { opacity: 0, y: -100, duration: 0.2, ease: 'power2.in' }, 0.15)
+
+      // Gap: 0.35–0.5 = empty black screen (clean pause)
+
+      // Photo: fades in 0.5–0.7
+      tl.fromTo(photoRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.2, ease: 'power2.out' },
+        0.5
+      )
+
+      // Intro: slides up 0.55–0.75 (slightly after photo starts)
+      tl.fromTo(introRef.current,
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out' },
+        0.55
+      )
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <section ref={containerRef} className="h-screen overflow-hidden relative" style={{ background: '#000' }}>
+
+      {/* Photo — right side, fades in with intro */}
+      <div ref={photoRef} className="absolute top-0 right-0 w-[55%] h-full hidden md:block" style={{ opacity: 0 }}>
+        <img src={heroImg} alt="Virat Singh" className="w-full h-full object-cover object-top" />
+        {/* Gradients blend photo edges into pure black bg */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, #000 0%, #000 5%, transparent 50%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, transparent 30%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #000 0%, transparent 15%)' }} />
+      </div>
+
+      {/* Quote — CLEAR on first frame, holds, then exits up */}
+      <div ref={quoteRef} className="absolute inset-0 flex items-center justify-center z-10">
+        <p className="text-lg md:text-xl font-500 leading-relaxed text-center max-w-2xl px-10 opacity-70">
+          The magic you're looking for,<br />is in the work you are avoiding.
+        </p>
+      </div>
+
+      {/* Intro — slides up after quote exits */}
+      <div ref={introRef} className="absolute inset-0 flex items-center z-10" style={{ opacity: 0 }}>
+        <div className="max-w-7xl mx-auto px-10 w-full">
+          <div className="max-w-lg">
+            <p className="text-sm font-400 opacity-40 mb-3">Hello,</p>
+            <h1 className="font-700 leading-[0.9] tracking-tight mb-8" style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' }}>
+              I am Virat<br />Singh<span style={{ color: blue }}>.</span>
+            </h1>
+            <p className="text-sm md:text-base leading-relaxed opacity-40 max-w-md">
+              A creative head and graphic designer based in Rajasthan, India. With 6+ years of experience, I specialize in transforming visions into visually stunning realities — from brand identities to digital campaigns.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll cue */}
+      <div ref={scrollCueRef} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10" style={{ opacity: 0.15 }}>
+        <span className="text-[0.6rem] font-500 tracking-[0.3em]">SCROLL</span>
+        <motion.span className="text-sm" animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 2 }}>↓</motion.span>
+      </div>
+    </section>
+  )
+}
+
+function Preloader({ onDone }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2200)
+    return () => clearTimeout(t)
+  }, [])
+
+  return (
+    <motion.div
+      className="fixed inset-0 flex items-center justify-center bg-[var(--color-dark)]"
+      style={{ zIndex: 9999 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+    >
+      <div className="flex flex-col items-center gap-6">
+        <motion.p className="text-xs font-500 tracking-[0.3em] opacity-30"
+          initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ duration: 0.5 }}>
+          VIRAT SINGH
+        </motion.p>
+        <div className="w-24 h-[1px] bg-white/5 overflow-hidden rounded-full">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: 'var(--color-blue)' }}
+            initial={{ width: '0%' }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+          />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ═══ APP ═══ */
+export default function App() {
+  const [loaded, setLoaded] = useState(false)
+  useSmoothScroll()
+  const { scrollYProgress } = useScroll()
+  const progressW = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
+
+  return (
+    <>
+      <AnimatePresence>
+        {!loaded && <Preloader onDone={() => setLoaded(true)} />}
+      </AnimatePresence>
+      <DrawCanvas />
+      <Cursor />
+      <motion.div className="fixed top-0 left-0 h-[2px] z-[999]" style={{ width: progressW, background: blue }} />
+
+      {/* ═══ HERO — scroll-driven: quote slides out, intro slides in ═══ */}
+      <HeroSection />
+
+      {/* ═══ 3. STORY (horizontal) ═══ */}
+      <StorySection />
+
+      {/* ═══ 4. 6+ YEARS — as a story beat ═══ */}
+      <section className="py-20 bg-[var(--color-light)] text-[var(--color-dark)] text-center">
+        <R>
+          <p className="text-sm font-400 opacity-30 mb-3">And it's been</p>
+          <p className="font-700 leading-none" style={{ fontSize: 'clamp(4rem, 10vw, 8rem)', color: blue }}>6+ YEARS</p>
+          <p className="text-sm font-700 opacity-30 mt-3">of turning ideas into visuals, brands into stories, and clients into believers.</p>
+        </R>
+      </section>
+
+      {/* ═══ 5. CAREER ═══ */}
+      <section className="py-16 bg-[var(--color-light)] text-[var(--color-dark)]">
+        <div className="max-w-3xl mx-auto px-10">
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-25 mb-8 text-center">CAREER PATH</p></R>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { period: 'Nov 2025 - Mar 2026', r: 'Sr. Graphic Designer', c: 'Designs & Words · Full-time', active: true },
+              { period: 'Nov 2022 - Jan 2025', r: 'Creative Head', c: 'Writations · Full-time' },
+              { period: 'Feb 2021 - Oct 2022', r: 'Sr. Graphic Designer', c: 'Empire Resort · Full-time' },
+              { period: 'Mar 2020 - Aug 2020', r: 'Graphic Designer', c: 'SHAURYA ATUL ACADEMY · Full-time' },
+            ].map((t, i) => (
+              <R key={i} delay={i * 0.06}>
+                <motion.div
+                  className={`group p-5 rounded-xl border transition-all duration-300 cursor-default ${t.active ? 'border-[var(--color-blue)]/15 bg-[var(--color-blue)]/[0.03]' : 'border-black/[0.05]'}`}
+                  whileHover={{ y: -3, scale: 1.01 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                >
+                  <p className={`text-sm font-600 ${t.active ? '' : 'opacity-70'}`} style={t.active ? { color: blue } : {}}>{t.r}</p>
+                  <p className={`text-xs mt-1 ${t.active ? 'opacity-45' : 'opacity-30'}`}>{t.c}</p>
+                  <p className="text-[0.6rem] opacity-20 mt-2 tracking-wide">{t.period}</p>
+                </motion.div>
+              </R>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 6. CRAFT ═══ */}
+      <CraftSection />
+
+      {/* ═══ 7. TOOLS ═══ */}
+      <section className="py-24 bg-[var(--color-dark)]">
+        <div className="max-w-6xl mx-auto px-10 text-center">
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-20 mb-8">WHAT I WORK WITH</p></R>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-14">
+            {tools.map((t, i) => (
+              <R key={t.name} delay={i * 0.03}>
+                <motion.div className="hover-target group p-5 rounded-xl border border-white/[0.04] text-center transition-colors duration-400 hover:border-white/[0.12] cursor-default"
+                  whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
+                  <div className="w-10 h-10 rounded-lg mx-auto flex items-center justify-center text-[0.65rem] font-700 mb-3" style={{ background: t.color + '15', color: t.color }}>{t.abbr}</div>
+                  <p className="text-[0.7rem] font-400 opacity-40 group-hover:opacity-80 transition-opacity">{t.name}</p>
+                </motion.div>
+              </R>
+            ))}
+          </div>
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-5" style={{ color: blue }}>AI COMPANIONS</p></R>
+          <div className="flex flex-wrap gap-3 justify-center">
+            {aiTools.map((t, i) => (
+              <R key={t.name} delay={i * 0.03}>
+                <motion.div className="hover-target flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/[0.04] transition-colors duration-300 hover:border-white/[0.12] cursor-default"
+                  whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
+                  <span className="text-sm">{t.icon}</span>
+                  <span className="text-xs font-400 opacity-40 group-hover:opacity-80">{t.name}</span>
+                </motion.div>
+              </R>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 8. OVERVIEW — clean, single row, no rectangles ═══ */}
+      <section className="py-20 bg-[var(--color-light)] text-[var(--color-dark)]">
+        <div className="max-w-7xl mx-auto px-10 text-center">
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-25 mb-10">OVERVIEW</p></R>
+          <R>
+            <div className="flex justify-between items-end flex-wrap gap-y-8">
+              {[
+                { n: 60, s: '+', l: 'Brands' },
+                { n: 15, s: '+', l: 'Industries' },
+                { n: 120, s: '+', l: 'Projects' },
+                { n: 10, s: 'K+', l: 'Designs Created' },
+              ].map((s, i) => (
+                <div key={i} className="text-center min-w-[100px]">
+                  <p className="font-700 leading-none" style={{ fontSize: '50px' }}><Counter target={s.n} suffix={s.s} /></p>
+                  <p className="text-xs font-400 opacity-30 mt-2">{s.l}</p>
+                </div>
+              ))}
+            </div>
+          </R>
+        </div>
+      </section>
+
+      {/* ═══ MARQUEE ═══ */}
+      <div className="py-5 overflow-hidden border-y border-white/[0.03] bg-[var(--color-dark)]">
+        <div className="flex w-max gap-10" style={{ animation: 'marquee 20s linear infinite' }}>
+          {[...Array(2)].flatMap((_, j) => ['WRITATIONS', 'EMPIRE RESORT', 'HEALTHSTORY', 'BRAND', 'BRAND', 'BRAND', 'BRAND', 'BRAND'].map((b, i) => (
+            <span key={`${j}-${i}`} className="hover-target text-xs font-500 tracking-[0.2em] opacity-10 whitespace-nowrap hover:opacity-60 transition-all cursor-default">{b}</span>
+          )))}
+        </div>
+        <style>{`@keyframes marquee{to{transform:translateX(-50%)}}`}</style>
+      </div>
+
+      {/* ═══ 9. WORK — no category/years ═══ */}
+      <section className="py-24 bg-[var(--color-light)] text-[var(--color-dark)]">
+        <div className="max-w-6xl mx-auto px-10">
+          <R><h2 className="text-xl font-600 mb-10">SELECTED WORKS</h2></R>
+          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+            {[
+              { title: 'Brand Identity Design', bg: 'linear-gradient(135deg,#667eea,#764ba2)' },
+              { title: 'Resort Visual Campaign', bg: 'linear-gradient(135deg,#f093fb,#f5576c)' },
+              { title: 'Social Media Redesign', bg: 'linear-gradient(135deg,#4facfe,#00f2fe)' },
+              { title: 'Packaging Design System', bg: 'linear-gradient(135deg,#43e97b,#38f9d7)' },
+            ].map((p, i) => (
+              <R key={i} delay={i * 0.05}>
+                <a href="#" className="hover-target block rounded-xl overflow-hidden group transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
+                  <div className="aspect-[4/3] transition-transform duration-700 group-hover:scale-105" style={{ background: p.bg }} />
+                  <div className="p-4 bg-white"><h3 className="font-500 text-sm">{p.title}</h3></div>
+                </a>
+              </R>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 10. QUOTE ═══ */}
+      <section className="flex items-center justify-center text-center bg-[var(--color-dark)] py-28">
+        <div className="max-w-4xl px-10">
+          <R><h2 className="font-700 leading-[1.15] tracking-tight" style={{ fontSize: '20px' }}>Kahi par pahuchne ke liye,<br />kahin se niklana padta hai.</h2></R>
+          <R delay={0.15}><p className="text-sm mt-8 opacity-12">to reach somewhere, you have to leave from somewhere.</p></R>
+        </div>
+      </section>
+
+      {/* ═══ 11. FLOATING QUOTES ═══ */}
+      <FloatingQuotesSection />
+
+      {/* ═══ 12. DREAMS — modern cards ═══ */}
+      <section className="relative overflow-hidden py-28" style={{ background: 'linear-gradient(180deg,#060a12,#0c1018 50%,#0a0a0a 100%)' }}>
+        <div className="absolute inset-0 pointer-events-none animate-pulse opacity-60" style={{ background: 'radial-gradient(1px at 8% 15%,rgba(59,130,246,.4),transparent),radial-gradient(1px at 25% 8%,rgba(255,255,255,.25),transparent),radial-gradient(1.5px at 45% 12%,rgba(59,130,246,.3),transparent),radial-gradient(1px at 65% 20%,rgba(255,255,255,.2),transparent),radial-gradient(1px at 88% 5%,rgba(59,130,246,.25),transparent),radial-gradient(1px at 12% 40%,rgba(255,255,255,.15),transparent),radial-gradient(1.5px at 38% 50%,rgba(59,130,246,.3),transparent),radial-gradient(1px at 58% 35%,rgba(255,255,255,.2),transparent),radial-gradient(1px at 50% 72%,rgba(59,130,246,.25),transparent)', animationDuration: '4s' }} />
+        <div className="relative z-10 max-w-4xl mx-auto px-10 text-center">
+          <R><h2 className="text-2xl md:text-4xl font-700 mb-2" style={{ color: blue }}>THINGS I WILL DO.</h2></R>
+          <R delay={0.08}><p className="text-xs opacity-15 mb-14">not a bucket list. a promise to myself.</p></R>
+          <div className="space-y-3 max-w-xl mx-auto text-left">
+            {['Read "Gunaho Ka Devta" 📖', 'Attend Arijit Singh Concert 🎵', 'Meet Vikas Divyakirti Sir 🙏', 'Meet Ritesh Agarwal 🚀', 'Meet Zakir Khan 🎤', 'Meet Saurabh Dwivedi 📺', 'Read "Hard Things About Hard Things" 📚'].map((d, i) => (
+              <R key={i} delay={i * 0.05}>
+                <motion.div
+                  className="group flex items-center gap-4 px-6 py-4 rounded-2xl border border-white/[0.03] relative overflow-hidden cursor-default"
+                  whileHover={{ x: 10, scale: 1.01, borderColor: 'rgba(59,130,246,0.15)' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-blue)]/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="w-5 h-5 rounded-full border border-white/8 flex items-center justify-center shrink-0 relative z-10 group-hover:border-[var(--color-blue)]/25 transition-colors">
+                    <motion.div className="w-1.5 h-1.5 rounded-full" style={{ background: blue }} initial={{ scale: 0 }} whileHover={{ scale: 1 }} />
+                  </div>
+                  <span className="text-sm font-400 relative z-10 opacity-60 group-hover:opacity-100 transition-opacity">{d}</span>
+                </motion.div>
+              </R>
+            ))}
+          </div>
+          <R delay={0.4}><p className="text-sm mt-10 opacity-15" style={{ color: blue }}>loading<span className="animate-pulse">...</span></p></R>
+        </div>
+      </section>
+
+      {/* ═══ 13. OFF SCREEN — with motion ═══ */}
+      <section className="py-24 bg-[var(--color-light)] text-[var(--color-dark)]">
+        <div className="max-w-6xl mx-auto px-10">
+          <R><h2 className="text-xl font-600 mb-10">OFF SCREEN.</h2></R>
+          <div className="grid grid-cols-3 gap-3 auto-rows-[220px] max-md:grid-cols-2 max-md:auto-rows-[180px]">
+            {[
+              { l: 'childhood 📸', c: 'the OG days', cls: 'row-span-2 max-md:row-span-1' },
+              { l: 'my bike 🏍️', c: 'freedom has two wheels' },
+              { l: 'rajasthan 🏰', c: 'home' },
+              { l: 'the squad 🤝', c: 'my people', cls: 'col-span-2 max-md:col-span-1' },
+              { l: 'on the road 🛣️', c: 'wind therapy' },
+              { l: 'moments ✨', c: 'collecting memories' },
+            ].map((g, i) => {
+              const directions = [
+                { x: -60, y: 40, rotate: -3 },
+                { x: 60, y: 30, rotate: 2 },
+                { x: -40, y: 50, rotate: -2 },
+                { x: 50, y: 40, rotate: 3 },
+                { x: -50, y: 35, rotate: -1 },
+                { x: 40, y: 45, rotate: 2 },
+              ]
+              const d = directions[i]
+              return (
+              <motion.div
+                key={i}
+                className={`group overflow-hidden rounded-xl relative ${g.cls || ''}`}
+                initial={{ opacity: 0, x: d.x, y: d.y, rotate: d.rotate, scale: 0.9 }}
+                whileInView={{ opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.7, delay: i * 0.08, ease: [0.25, 1, 0.5, 1] }}
+              >
+                <motion.div
+                  className="w-full h-full flex items-center justify-center text-sm opacity-15 bg-[var(--color-dark)] text-[var(--color-light)]"
+                  whileHover={{ scale: 1.08 }}
+                  transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+                >{g.l}</motion.div>
+                <motion.p
+                  className="absolute bottom-0 inset-x-0 p-3 text-xs bg-gradient-to-t from-black/70 to-transparent text-white"
+                  initial={{ y: '100%' }}
+                  whileHover={{ y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >{g.c}</motion.p>
+              </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 14. SOUL ═══ */}
+      <section className="py-24 bg-[var(--color-dark)]">
+        <div className="max-w-6xl mx-auto px-10">
+          <ShayariSection />
+          <div>
+            <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-2" style={{ color: blue }}>ON REPEAT 🎧</p></R>
+            <R delay={0.05}><p className="text-[0.6rem] opacity-12 mb-5">you can tell a lot about a person by their playlist.</p></R>
+            <R delay={0.08}>
+              <div className="flex flex-wrap gap-2">
+                {['Tum Hi Ho', 'Channa Mereya', 'Kesariya', 'Deva Deva', 'Agar Tum Saath Ho', 'Phir Bhi Tumko Chaahunga'].map(s => (
+                  <span key={s} className="hover-target text-xs font-400 px-4 py-2 rounded-full border border-white/[0.04] transition-all duration-300 hover:border-[var(--color-blue)]/25 cursor-default">{s}</span>
+                ))}
+              </div>
+              <p className="text-[0.6rem] opacity-8 mt-3">— all Arijit Singh. obviously.</p>
+            </R>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ TESTIMONIALS — stacked card carousel ═══ */}
+      <TestimonialSection />
+
+      {/* ═══ FOOTER ═══ */}
+      <div className="bg-[var(--color-light)] text-[var(--color-dark)] border-t border-black/[0.06] py-6 px-10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+          <a href="mailto:hello@viratsingh.com" className="hover-target text-sm font-600 hover:opacity-60 transition-opacity">hello@viratsingh.com</a>
+          <div className="flex items-center gap-4">
+            <a href="#" className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[var(--color-dark)] hover:text-white hover:border-transparent transition-all duration-300">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
+            <a href="#" className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[var(--color-dark)] hover:text-white hover:border-transparent transition-all duration-300">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="#" className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[#25D366] hover:text-white hover:border-transparent transition-all duration-300">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}

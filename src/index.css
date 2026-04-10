@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('./assets/fonts/GoogleSans-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('./assets/fonts/GoogleSans-Italic-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@theme {
+  --font-main: 'Google Sans', system-ui, sans-serif;
+  --color-blue: #3B82F6;
+  --color-blue-dim: rgba(59,130,246,.08);
+  --color-blue-glow: rgba(59,130,246,.15);
+  --color-light: #f5f5f5;
+  --color-dark: #0a0a0a;
+  --color-dark2: #111111;
+}
+
+html { scroll-behavior: auto; -webkit-font-smoothing: antialiased; }
+body { margin: 0; font-family: var(--font-main); background: var(--color-dark); color: #f5f5f5; overflow-x: hidden; }
+@media (hover: hover) { body { cursor: none; } a, button { cursor: none; } }
+@media (hover: none) { body { cursor: auto; } a, button { cursor: auto; } }
+button { pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 50; }
+::selection { background: var(--color-blue); color: white; }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--color-dark); }
+::-webkit-scrollbar-thumb { background: var(--color-blue-dim); border-radius: 2px; }
+#root { width: 100%; max-width: 100%; }
