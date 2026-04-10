@@ -86,18 +86,15 @@ function StorySection() {
 
       <div ref={tRef} className="flex w-max h-screen">
         {panels.map((p, i) => (
-          <div key={i} className="h-screen flex items-center shrink-0 px-12 md:px-16" style={{ width: '90vw' }}>
-            <div className="max-w-4xl mx-auto w-full flex gap-14 items-center">
+          <div key={i} className="h-screen flex items-center shrink-0 px-6 md:px-16" style={{ width: '90vw' }}>
+            <div className="max-w-4xl mx-auto w-full flex flex-col-reverse md:flex-row gap-6 md:gap-14 items-center">
               <div className="flex-1 min-w-0">
-                <p className="text-[6rem] md:text-[8rem] leading-none font-700 select-none tracking-tight opacity-10">{p.year}</p>
+                <p className="text-[4rem] md:text-[8rem] leading-none font-700 select-none tracking-tight opacity-10">{p.year}</p>
                 <h2 className="text-2xl md:text-4xl font-700 leading-tight mt-3 whitespace-pre-line" style={{ color: '#3B82F6' }}>{p.title}</h2>
                 <p className="text-sm md:text-base leading-relaxed mt-5 max-w-md" style={{ color: 'rgba(0,0,0,0.45)' }}>{p.content}</p>
               </div>
-              {p.img && <div className="hidden md:block w-72 shrink-0 overflow-hidden rounded-2xl">
-                {p.realImg
-                  ? <img src={p.img} alt="" className="aspect-[3/4] w-full object-cover grayscale" style={{ transform: p.zoom ? `scale(${p.zoom})` : undefined, objectPosition: p.pos || 'center top' }} />
-                  : <div className="aspect-[3/4] rounded-2xl flex items-center justify-center text-xs opacity-15 bg-[var(--color-dark)] text-[var(--color-light)]">{p.img}</div>
-                }
+              {p.img && p.realImg && <div className="w-40 md:w-72 shrink-0 overflow-hidden rounded-2xl">
+                <img src={p.img} alt="" className="aspect-[3/4] w-full object-cover grayscale" style={{ transform: p.zoom ? `scale(${p.zoom})` : undefined, objectPosition: p.pos || 'center top' }} />
               </div>}
             </div>
           </div>
@@ -193,19 +190,20 @@ function FloatingQuotesSection() {
   ]
 
   return (
-    <section ref={ref} className="relative overflow-hidden" style={{ minHeight: '120vh', background: 'linear-gradient(180deg, #0a0a0a 0%, #060a12 100%)' }}>
+    <section ref={ref} className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #060a12 100%)' }}>
       <div className="absolute inset-0">
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #3B82F6, transparent 70%)' }} />
         <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full opacity-[0.02]" style={{ background: 'radial-gradient(circle, #8B5CF6, transparent 70%)' }} />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-10 pt-24 pb-10 text-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pt-24 pb-10 text-center">
         <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-15 mb-3">THINGS I BELIEVE IN</p></R>
         <R delay={0.05}><p className="text-xs opacity-10 mb-6">quotes, shers, and borrowed wisdom.</p></R>
       </div>
 
-      {/* Floating cards — pop from bottom on scroll */}
-      <div className="relative max-w-6xl mx-auto px-10" style={{ height: '85vh' }}>
+      {/* Floating cards — scattered on desktop, stacked on mobile */}
+      {/* Desktop: absolute positioned */}
+      <div className="relative max-w-6xl mx-auto px-10 hidden md:block" style={{ height: '85vh', minHeight: '600px' }}>
         {cards.map((card, i) => {
           const l = layouts[i]
           return (
@@ -228,6 +226,26 @@ function FloatingQuotesSection() {
             </motion.div>
           )
         })}
+      </div>
+      {/* Mobile: stacked list */}
+      <div className="md:hidden max-w-6xl mx-auto px-6 pb-16 space-y-3">
+        {cards.map((card, i) => (
+          <motion.div
+            key={i}
+            className="group cursor-default"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 0.5, delay: i * 0.05 }}
+          >
+            <div className="rounded-2xl p-5 border border-white/[0.06]"
+              style={{ background: `linear-gradient(135deg, ${card.accent}08, ${card.accent}04)` }}>
+              <div className="w-2 h-2 rounded-full mb-3 opacity-60" style={{ background: card.accent }} />
+              <p className="font-400 leading-relaxed text-white/50" style={{ fontSize: '12px' }}>{card.text}</p>
+              {card.sub && <p className="mt-2 text-white/20" style={{ fontSize: '10px' }}>{card.sub}</p>}
+            </div>
+          </motion.div>
+        ))}
       </div>
     </section>
   )
@@ -387,10 +405,11 @@ function HeroSection() {
     <section ref={containerRef} className="h-screen overflow-hidden relative" style={{ background: '#000' }}>
 
       {/* Photo — right side, fades in with intro */}
-      <div ref={photoRef} className="absolute top-0 right-0 w-[55%] h-full hidden md:block" style={{ opacity: 0 }}>
+      <div ref={photoRef} className="absolute top-0 right-0 w-full md:w-[55%] h-full" style={{ opacity: 0 }}>
         <img src={heroImg} alt="Virat Singh" className="w-full h-full object-cover object-top" />
         {/* Gradients blend photo edges into pure black bg */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, #000 0%, #000 5%, transparent 50%)' }} />
+        <div className="absolute inset-0 md:hidden" style={{ background: 'rgba(0,0,0,0.6)' }} />
+        <div className="absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(to right, #000 0%, #000 5%, transparent 50%)' }} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, transparent 30%)' }} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #000 0%, transparent 15%)' }} />
       </div>
@@ -554,15 +573,15 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-10 text-center">
           <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-25 mb-10">OVERVIEW</p></R>
           <R>
-            <div className="flex justify-between items-end flex-wrap gap-y-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-4">
               {[
                 { n: 60, s: '+', l: 'Brands' },
                 { n: 15, s: '+', l: 'Industries' },
                 { n: 120, s: '+', l: 'Projects' },
                 { n: 10, s: 'K+', l: 'Designs Created' },
               ].map((s, i) => (
-                <div key={i} className="text-center min-w-[100px]">
-                  <p className="font-700 leading-none" style={{ fontSize: '50px' }}><Counter target={s.n} suffix={s.s} /></p>
+                <div key={i} className="text-center">
+                  <p className="font-700 leading-none" style={{ fontSize: 'clamp(36px, 8vw, 50px)' }}><Counter target={s.n} suffix={s.s} /></p>
                   <p className="text-xs font-400 opacity-30 mt-2">{s.l}</p>
                 </div>
               ))}
@@ -713,7 +732,7 @@ export default function App() {
       <TestimonialSection />
 
       {/* ═══ FOOTER ═══ */}
-      <div className="bg-[var(--color-light)] text-[var(--color-dark)] border-t border-black/[0.06] py-6 px-10">
+      <div className="bg-[var(--color-light)] text-[var(--color-dark)] border-t border-black/[0.06] py-6 px-6 md:px-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <a href="mailto:hello@viratsingh.com" className="hover-target text-sm font-600 hover:opacity-60 transition-opacity">hello@viratsingh.com</a>
           <div className="flex items-center gap-4">
