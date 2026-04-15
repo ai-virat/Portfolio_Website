@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, useInView, useScroll, useTransform, useMotionValue, animate, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -11,6 +12,37 @@ import cricketImg from './assets/cricket.jpg'
 import injuryImg from './assets/injury.png'
 import plottwistImg from './assets/plottwist.jpg'
 import presentImg from './assets/present.jpg'
+import { hero, craft, tools, aiTools, career, stats, works, quoteSection, floatingQuotes, shayari, dreams, playlist, testimonials as testimonialData, gallery, footer } from './content'
+import vanshdeepThumb from './assets/Vanshdeep logo.jpg'
+import sharkThumb from './assets/Shark Slide/SharkLogo.svg'
+
+// Brand logos
+const logoModules = import.meta.glob('./assets/logos/*.svg', { eager: true, query: '?url', import: 'default' })
+// Logos that need extra scaling (tall/square aspect ratios appear smaller)
+const logoScale = {
+  'logo-3': 1.3,
+  'logo-5': 1.35,
+  'logo-12': 1.25,
+  'logo-15': 1.4,
+  'logo-16': 1.2,
+  'logo-17': 1.3,
+  'logo-18': 1.25,
+  'logo-20': 1.35,
+  'logo-21': 1.4,
+  'logo-22': 1.25,
+}
+const excludeLogos = new Set(['logo-24'])
+const brandLogos = Object.entries(logoModules)
+  .sort(([a], [b]) => {
+    const numA = parseInt(a.match(/logo-(\d+)/)?.[1] || '0')
+    const numB = parseInt(b.match(/logo-(\d+)/)?.[1] || '0')
+    return numA - numB
+  })
+  .filter(([path]) => !excludeLogos.has(path.split('/').pop().replace('.svg', '')))
+  .map(([path, url]) => {
+    const name = path.split('/').pop().replace('.svg', '')
+    return { src: url, name, scale: logoScale[name] || 1 }
+  })
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -108,7 +140,7 @@ function StorySection() {
 function CraftSection() {
   const [h, setH] = useState(null)
   const ref = useRef(null), v = useInView(ref, { once: true, margin: '-80px' })
-  const lines = ['I SHOOT.', 'I EDIT.', 'I DESIGN.', 'I VIBE CODE.']
+  const lines = craft.lines
 
   const getOpacity = (i) => {
     if (!v) return 0
@@ -139,43 +171,19 @@ function CraftSection() {
             onMouseEnter={() => setH(i)}
           >{l}</motion.h2>
         ))}
-        <motion.p className="text-sm mt-8 opacity-10" initial={{ opacity: 0 }} animate={v ? { opacity: 0.1 } : {}} transition={{ delay: 0.7 }}>that's not a resume. that's a tuesday.</motion.p>
+        <motion.p className="text-sm mt-8 opacity-10" initial={{ opacity: 0 }} animate={v ? { opacity: 0.1 } : {}} transition={{ delay: 0.7 }}>{craft.subtitle}</motion.p>
       </div>
     </section>
   )
 }
 
-/* ═══ TOOLS ═══ */
-const tools = [
-  { name: 'Photoshop', abbr: 'Ps', color: '#31A8FF' },
-  { name: 'Illustrator', abbr: 'Ai', color: '#FF9A00' },
-  { name: 'After Effects', abbr: 'Ae', color: '#9999FF' },
-  { name: 'Premiere Pro', abbr: 'Pr', color: '#9999FF' },
-  { name: 'Figma', abbr: 'Fg', color: '#A259FF' },
-  { name: 'InDesign', abbr: 'Id', color: '#FF3366' },
-]
-const aiTools = [
-  { name: 'Claude', icon: '🤖' },
-  { name: 'ChatGPT', icon: '💬' },
-  { name: 'Gemini', icon: '✨' },
-  { name: 'Higgsfield', icon: '🎬' },
-  { name: 'Midjourney', icon: '🎨' },
-]
+/* ═══ TOOLS — from content.js ═══ */
 
 /* ═══ FLOATING SCATTERED QUOTES ═══ */
 function FloatingQuotesSection() {
   const ref = useRef(null), v = useInView(ref, { once: true, margin: '-50px' })
 
-  const cards = [
-    { text: '"The magic you\'re looking for is in the work you\'re avoiding."', accent: '#3B82F6' },
-    { text: '"Life is this 🤚... but I like this 🤚"', sub: '— Harvey Specter', accent: '#F59E0B' },
-    { text: '"Kahi par pahuchne ke liye, kahin se niklana padta hai."', accent: '#10B981' },
-    { text: '"I didn\'t come this far, to only come this far."', accent: '#EF4444' },
-    { text: '"Design is not just what it looks like. Design is how it works."', sub: '— Steve Jobs', accent: '#8B5CF6' },
-    { text: '"Sapne wo nahi jo neend mein aaye, sapne wo hain jo neend nahi aane dein."', sub: '— APJ Abdul Kalam', accent: '#EC4899' },
-    { text: '"First they ignore you, then they laugh at you, then they fight you, then you win."', accent: '#06B6D4' },
-    { text: '"Manzil unhi ko milti hai, jinke sapno mein jaan hoti hai."', accent: '#F97316' },
-  ]
+  const cards = floatingQuotes
 
   // Scattered positions — overlapping, rotated, like dropped cards
   const layouts = [
@@ -253,11 +261,7 @@ function FloatingQuotesSection() {
 
 /* ═══ SHAYARI ═══ */
 function ShayariSection() {
-  const shers = [
-    { text: 'ख्वाब तो आँखों में है अब भी\nफिर भी उनकी ताबीरों से दिल डरता है\n\nथके हुए पल, डरे हुए दिल, दुखी हुई आँखों से कह दो\nऔर कोई अब ख्वाब ना देखें', author: '— अशफ़ाक़ हुसैन' },
-    { text: 'दिन कुछ ऐसे गुज़ारता है कोई\nजैसे एहसाँ उतारता है कोई\n\nआइना देख कर तसल्ली हुई\nहम को इस घर में जानता है कोई', author: '— गुलज़ार' },
-    { text: 'One more — because good things come in threes. Your voice, your ink, your fire.', author: null },
-  ]
+  const shers = shayari
 
   return (
     <div className="mb-20">
@@ -285,13 +289,7 @@ function ShayariSection() {
 
 /* ═══ TESTIMONIALS — stacked rotating cards ═══ */
 function TestimonialSection() {
-  const testimonials = [
-    { text: '"Virat has an incredible eye for design. He transformed our brand identity and the results were beyond what we imagined."', name: 'Client Name', role: 'CEO, Company' },
-    { text: '"Working with Virat was seamless. He understands the vision quickly and delivers designs that truly speak to the audience."', name: 'Client Name', role: 'Marketing Head, Brand' },
-    { text: '"From concept to execution, Virat brought a level of creativity and professionalism that\'s rare to find. Highly recommend."', name: 'Client Name', role: 'Founder, Startup' },
-    { text: '"The brand identity Virat created for us elevated our entire business. Clients started taking us more seriously overnight."', name: 'Client Name', role: 'Director, Agency' },
-    { text: '"Virat doesn\'t just design — he tells stories through visuals. Every project felt personal and intentional."', name: 'Client Name', role: 'Co-founder, Studio' },
-  ]
+  const testimonials = testimonialData
 
   const [current, setCurrent] = useState(0)
   const dir = useRef(0)
@@ -416,8 +414,8 @@ function HeroSection() {
 
       {/* Quote — CLEAR on first frame, holds, then exits up */}
       <div ref={quoteRef} className="absolute inset-0 flex items-center justify-center z-10">
-        <p className="text-lg md:text-xl font-500 leading-relaxed text-center max-w-2xl px-10 opacity-70">
-          The magic you're looking for,<br />is in the work you are avoiding.
+        <p className="text-lg md:text-xl font-500 leading-relaxed text-center max-w-2xl px-10 opacity-70 whitespace-pre-line">
+          {hero.quote}
         </p>
       </div>
 
@@ -425,12 +423,12 @@ function HeroSection() {
       <div ref={introRef} className="absolute inset-0 flex items-center z-10" style={{ opacity: 0 }}>
         <div className="max-w-7xl mx-auto px-10 w-full">
           <div className="max-w-lg">
-            <p className="text-sm font-400 opacity-40 mb-3">Hello,</p>
+            <p className="text-sm font-400 opacity-40 mb-3">{hero.greeting}</p>
             <h1 className="font-700 leading-[0.9] tracking-tight mb-8" style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' }}>
-              I am Virat<br />Singh<span style={{ color: blue }}>.</span>
+              I am {hero.name}<br />{hero.surname}<span style={{ color: blue }}>.</span>
             </h1>
             <p className="text-sm md:text-base leading-relaxed opacity-40 max-w-md">
-              A creative head and graphic designer based in Rajasthan, India. With 6+ years of experience, I specialize in transforming visions into visually stunning realities — from brand identities to digital campaigns.
+              {hero.bio}
             </p>
           </div>
         </div>
@@ -496,6 +494,45 @@ export default function App() {
       {/* ═══ HERO — scroll-driven: quote slides out, intro slides in ═══ */}
       <HeroSection />
 
+      {/* ═══ BRAND LOGOS MARQUEE ═══ */}
+      <div className="pb-16 pt-8 overflow-hidden" style={{ background: '#000' }}>
+        <div className="logo-marquee-track flex w-max items-center gap-[80px] px-10">
+          {[...Array(2)].flatMap((_, setIndex) =>
+            brandLogos.map((logo, i) => (
+              <img
+                key={`${setIndex}-${i}`}
+                src={logo.src}
+                alt={logo.name}
+                className="logo-marquee-item hover-target"
+                style={logo.scale !== 1 ? { transform: `scale(${logo.scale})` } : undefined}
+                draggable={false}
+              />
+            ))
+          )}
+        </div>
+        <style>{`
+          .logo-marquee-track {
+            animation: logoMarquee 35s linear infinite;
+          }
+          .logo-marquee-item {
+            width: 180px;
+            height: 80px;
+            object-fit: contain;
+            filter: grayscale(1) brightness(0.6) contrast(1.2);
+            opacity: 0.45;
+            transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+          }
+          .logo-marquee-item:hover {
+            filter: grayscale(0) brightness(1) contrast(1) drop-shadow(0 0 20px rgba(212,175,55,0.15));
+            opacity: 1;
+          }
+          @keyframes logoMarquee {
+            to { transform: translateX(-50%); }
+          }
+        `}</style>
+      </div>
+
       {/* ═══ 3. STORY (horizontal) ═══ */}
       <StorySection />
 
@@ -513,20 +550,15 @@ export default function App() {
         <div className="max-w-3xl mx-auto px-10">
           <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-25 mb-8 text-center">CAREER PATH</p></R>
           <div className="grid md:grid-cols-2 gap-4">
-            {[
-              { period: 'Nov 2025 - Mar 2026', r: 'Sr. Graphic Designer', c: 'Designs & Words · Full-time', active: true },
-              { period: 'Nov 2022 - Jan 2025', r: 'Creative Head', c: 'Writations · Full-time' },
-              { period: 'Feb 2021 - Oct 2022', r: 'Sr. Graphic Designer', c: 'Empire Resort · Full-time' },
-              { period: 'Mar 2020 - Aug 2020', r: 'Graphic Designer', c: 'SHAURYA ATUL ACADEMY · Full-time' },
-            ].map((t, i) => (
+            {career.map((t, i) => (
               <R key={i} delay={i * 0.06}>
                 <motion.div
                   className={`group p-5 rounded-xl border transition-all duration-300 cursor-default ${t.active ? 'border-[var(--color-blue)]/15 bg-[var(--color-blue)]/[0.03]' : 'border-black/[0.05]'}`}
                   whileHover={{ y: -3, scale: 1.01 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 >
-                  <p className={`text-sm font-600 ${t.active ? '' : 'opacity-70'}`} style={t.active ? { color: blue } : {}}>{t.r}</p>
-                  <p className={`text-xs mt-1 ${t.active ? 'opacity-45' : 'opacity-30'}`}>{t.c}</p>
+                  <p className={`text-sm font-600 ${t.active ? '' : 'opacity-70'}`} style={t.active ? { color: blue } : {}}>{t.role}</p>
+                  <p className={`text-xs mt-1 ${t.active ? 'opacity-45' : 'opacity-30'}`}>{t.company}</p>
                   <p className="text-[0.6rem] opacity-20 mt-2 tracking-wide">{t.period}</p>
                 </motion.div>
               </R>
@@ -574,15 +606,10 @@ export default function App() {
           <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-25 mb-10">OVERVIEW</p></R>
           <R>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-4">
-              {[
-                { n: 60, s: '+', l: 'Brands' },
-                { n: 15, s: '+', l: 'Industries' },
-                { n: 120, s: '+', l: 'Projects' },
-                { n: 10, s: 'K+', l: 'Designs Created' },
-              ].map((s, i) => (
+              {stats.map((s, i) => (
                 <div key={i} className="text-center">
-                  <p className="font-700 leading-none" style={{ fontSize: 'clamp(36px, 8vw, 50px)' }}><Counter target={s.n} suffix={s.s} /></p>
-                  <p className="text-xs font-400 opacity-30 mt-2">{s.l}</p>
+                  <p className="font-700 leading-none" style={{ fontSize: 'clamp(36px, 8vw, 50px)' }}><Counter target={s.number} suffix={s.suffix} /></p>
+                  <p className="text-xs font-400 opacity-30 mt-2">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -590,32 +617,31 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ MARQUEE ═══ */}
-      <div className="py-5 overflow-hidden border-y border-white/[0.03] bg-[var(--color-dark)]">
-        <div className="flex w-max gap-10" style={{ animation: 'marquee 20s linear infinite' }}>
-          {[...Array(2)].flatMap((_, j) => ['WRITATIONS', 'EMPIRE RESORT', 'HEALTHSTORY', 'BRAND', 'BRAND', 'BRAND', 'BRAND', 'BRAND'].map((b, i) => (
-            <span key={`${j}-${i}`} className="hover-target text-xs font-500 tracking-[0.2em] opacity-10 whitespace-nowrap hover:opacity-60 transition-all cursor-default">{b}</span>
-          )))}
-        </div>
-        <style>{`@keyframes marquee{to{transform:translateX(-50%)}}`}</style>
-      </div>
-
       {/* ═══ 9. WORK — no category/years ═══ */}
       <section className="py-24 bg-[var(--color-light)] text-[var(--color-dark)]">
         <div className="max-w-6xl mx-auto px-10">
           <R><h2 className="text-xl font-600 mb-10">SELECTED WORKS</h2></R>
           <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
-            {[
-              { title: 'Brand Identity Design', bg: 'linear-gradient(135deg,#667eea,#764ba2)' },
-              { title: 'Resort Visual Campaign', bg: 'linear-gradient(135deg,#f093fb,#f5576c)' },
-              { title: 'Social Media Redesign', bg: 'linear-gradient(135deg,#4facfe,#00f2fe)' },
-              { title: 'Packaging Design System', bg: 'linear-gradient(135deg,#43e97b,#38f9d7)' },
-            ].map((p, i) => (
+            {works.map((p, i) => (
               <R key={i} delay={i * 0.05}>
-                <a href="#" className="hover-target block rounded-xl overflow-hidden group transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                  <div className="aspect-[4/3] transition-transform duration-700 group-hover:scale-105" style={{ background: p.bg }} />
-                  <div className="p-4 bg-white"><h3 className="font-500 text-sm">{p.title}</h3></div>
-                </a>
+                {p.link ? (
+                  <div
+                    className="hover-target block rounded-xl overflow-hidden group transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                    onClick={() => window.location.href = p.link}
+                    role="link"
+                  >
+                    <div className="aspect-[4/3] transition-transform duration-700 group-hover:scale-105 relative" style={{ background: p.bg }}>
+                      {p.thumb === 'vanshdeep' && <img src={vanshdeepThumb} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+                      {p.thumb === 'cloudysharks' && <img src={sharkThumb} alt="" className="absolute inset-0 w-full h-full object-contain p-10" />}
+                    </div>
+                    <div className="p-4 bg-white"><h3 className="font-500 text-sm">{p.title}</h3></div>
+                  </div>
+                ) : (
+                  <div className="hover-target block rounded-xl overflow-hidden group transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl cursor-pointer">
+                    <div className="aspect-[4/3] transition-transform duration-700 group-hover:scale-105" style={{ background: p.bg }} />
+                    <div className="p-4 bg-white"><h3 className="font-500 text-sm">{p.title}</h3></div>
+                  </div>
+                )}
               </R>
             ))}
           </div>
@@ -625,8 +651,8 @@ export default function App() {
       {/* ═══ 10. QUOTE ═══ */}
       <section className="flex items-center justify-center text-center bg-[var(--color-dark)] py-28">
         <div className="max-w-4xl px-10">
-          <R><h2 className="font-700 leading-[1.15] tracking-tight" style={{ fontSize: '20px' }}>Kahi par pahuchne ke liye,<br />kahin se niklana padta hai.</h2></R>
-          <R delay={0.15}><p className="text-sm mt-8 opacity-12">to reach somewhere, you have to leave from somewhere.</p></R>
+          <R><h2 className="font-700 leading-[1.15] tracking-tight whitespace-pre-line" style={{ fontSize: '20px' }}>{quoteSection.hindi}</h2></R>
+          <R delay={0.15}><p className="text-sm mt-8 opacity-12">{quoteSection.english}</p></R>
         </div>
       </section>
 
@@ -640,7 +666,7 @@ export default function App() {
           <R><h2 className="text-2xl md:text-4xl font-700 mb-2" style={{ color: blue }}>THINGS I WILL DO.</h2></R>
           <R delay={0.08}><p className="text-xs opacity-15 mb-14">not a bucket list. a promise to myself.</p></R>
           <div className="space-y-3 max-w-xl mx-auto text-left">
-            {['Read "Gunaho Ka Devta" 📖', 'Attend Arijit Singh Concert 🎵', 'Meet Vikas Divyakirti Sir 🙏', 'Meet Ritesh Agarwal 🚀', 'Meet Zakir Khan 🎤', 'Meet Saurabh Dwivedi 📺', 'Read "Hard Things About Hard Things" 📚'].map((d, i) => (
+            {dreams.map((d, i) => (
               <R key={i} delay={i * 0.05}>
                 <motion.div
                   className="group flex items-center gap-4 px-6 py-4 rounded-2xl border border-white/[0.03] relative overflow-hidden cursor-default"
@@ -665,14 +691,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-10">
           <R><h2 className="text-xl font-600 mb-10">OFF SCREEN.</h2></R>
           <div className="grid grid-cols-3 gap-3 auto-rows-[220px] max-md:grid-cols-2 max-md:auto-rows-[180px]">
-            {[
-              { l: 'childhood 📸', c: 'the OG days', cls: 'row-span-2 max-md:row-span-1' },
-              { l: 'my bike 🏍️', c: 'freedom has two wheels' },
-              { l: 'rajasthan 🏰', c: 'home' },
-              { l: 'the squad 🤝', c: 'my people', cls: 'col-span-2 max-md:col-span-1' },
-              { l: 'on the road 🛣️', c: 'wind therapy' },
-              { l: 'moments ✨', c: 'collecting memories' },
-            ].map((g, i) => {
+            {gallery.map((g, i) => {
               const directions = [
                 { x: -60, y: 40, rotate: -3 },
                 { x: 60, y: 30, rotate: 2 },
@@ -695,13 +714,13 @@ export default function App() {
                   className="w-full h-full flex items-center justify-center text-sm opacity-15 bg-[var(--color-dark)] text-[var(--color-light)]"
                   whileHover={{ scale: 1.08 }}
                   transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                >{g.l}</motion.div>
+                >{g.label}</motion.div>
                 <motion.p
                   className="absolute bottom-0 inset-x-0 p-3 text-xs bg-gradient-to-t from-black/70 to-transparent text-white"
                   initial={{ y: '100%' }}
                   whileHover={{ y: 0 }}
                   transition={{ duration: 0.3 }}
-                >{g.c}</motion.p>
+                >{g.caption}</motion.p>
               </motion.div>
               )
             })}
@@ -718,7 +737,7 @@ export default function App() {
             <R delay={0.05}><p className="text-[0.6rem] opacity-12 mb-5">you can tell a lot about a person by their playlist.</p></R>
             <R delay={0.08}>
               <div className="flex flex-wrap gap-2">
-                {['Tum Hi Ho', 'Channa Mereya', 'Kesariya', 'Deva Deva', 'Agar Tum Saath Ho', 'Phir Bhi Tumko Chaahunga'].map(s => (
+                {playlist.map(s => (
                   <span key={s} className="hover-target text-xs font-400 px-4 py-2 rounded-full border border-white/[0.04] transition-all duration-300 hover:border-[var(--color-blue)]/25 cursor-default">{s}</span>
                 ))}
               </div>
@@ -734,15 +753,15 @@ export default function App() {
       {/* ═══ FOOTER ═══ */}
       <div className="bg-[var(--color-light)] text-[var(--color-dark)] border-t border-black/[0.06] py-6 px-6 md:px-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-          <a href="mailto:hello@viratsingh.com" className="hover-target text-sm font-600 hover:opacity-60 transition-opacity">hello@viratsingh.com</a>
+          <a href={`mailto:${footer.email}`} className="hover-target text-sm font-600 hover:opacity-60 transition-opacity">{footer.email}</a>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[var(--color-dark)] hover:text-white hover:border-transparent transition-all duration-300">
+            <a href={footer.instagram} className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[var(--color-dark)] hover:text-white hover:border-transparent transition-all duration-300">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
-            <a href="#" className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[var(--color-dark)] hover:text-white hover:border-transparent transition-all duration-300">
+            <a href={footer.linkedin} className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[var(--color-dark)] hover:text-white hover:border-transparent transition-all duration-300">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             </a>
-            <a href="#" className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[#25D366] hover:text-white hover:border-transparent transition-all duration-300">
+            <a href={footer.whatsapp} className="hover-target w-9 h-9 rounded-full border border-black/10 flex items-center justify-center hover:bg-[#25D366] hover:text-white hover:border-transparent transition-all duration-300">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             </a>
           </div>

@@ -36,3 +36,5 @@ button { pointer-events: auto !important; cursor: pointer !important; position: 
 ::-webkit-scrollbar-track { background: var(--color-dark); }
 ::-webkit-scrollbar-thumb { background: var(--color-blue-dim); border-radius: 2px; }
 #root { width: 100%; max-width: 100%; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

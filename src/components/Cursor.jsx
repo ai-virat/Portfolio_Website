@@ -16,10 +16,10 @@ export default function Cursor() {
     document.addEventListener('mousemove', onMove)
 
     const loop = () => {
-      dx += (mx - dx) * 0.15
-      dy += (my - dy) * 0.15
-      rx += (mx - rx) * 0.08
-      ry += (my - ry) * 0.08
+      dx += (mx - dx) * 0.2
+      dy += (my - dy) * 0.2
+      rx += (mx - rx) * 0.12
+      ry += (my - ry) * 0.12
       if (dot) dot.style.transform = `translate(${dx - 4}px, ${dy - 4}px)`
       if (ring) ring.style.transform = `translate(${rx - 20}px, ${ry - 20}px)`
       requestAnimationFrame(loop)
