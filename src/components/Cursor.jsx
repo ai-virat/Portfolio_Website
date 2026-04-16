@@ -56,8 +56,8 @@ export default function Cursor() {
 
   return (
     <>
-      <div ref={dotRef} className="fixed z-[9999] pointer-events-none" style={{ width: 8, height: 8, background: 'var(--color-accent)', borderRadius: '50%', willChange: 'transform' }} />
-      <div ref={ringRef} className="fixed z-[9998] pointer-events-none" style={{ width: 40, height: 40, border: '1px solid rgba(200,165,90,0.35)', borderRadius: '50%', transition: 'width 0.3s, height 0.3s', willChange: 'transform' }} />
+      <div ref={dotRef} className="fixed z-[9999] pointer-events-none" style={{ width: 8, height: 8, background: '#3B82F6', borderRadius: '50%', willChange: 'transform' }} />
+      <div ref={ringRef} className="fixed z-[9998] pointer-events-none" style={{ width: 40, height: 40, border: '1px solid rgba(59,130,246,0.3)', borderRadius: '50%', transition: 'width 0.3s, height 0.3s', willChange: 'transform' }} />
     </>
   )
 }

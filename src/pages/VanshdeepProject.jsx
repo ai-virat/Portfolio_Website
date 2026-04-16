@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
+import ReactDOM from 'react-dom'
 import { motion, useInView } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
@@ -18,14 +19,24 @@ import np5 from '../assets/newspaper 5.jpg'
 import np6 from '../assets/newspaper 6.jpg'
 import np7 from '../assets/newspaper 7.jpg'
 import npLast from '../assets/newspaper.jpg'
-import hoardingImg from '../assets/Vanshdeep/hoarding.jpg'
 import visitingCardImg from '../assets/Vanshdeep/visiting card.jpg'
 import bagImg from '../assets/Vanshdeep/bag.jpg'
 import logoImg from '../assets/Vanshdeep/logo.png'
-import sm06 from '../assets/Vanshdeep/social media design/AURA - SM grid-06.jpg'
-import sm07 from '../assets/Vanshdeep/social media design/AURA - SM grid-07.jpg'
-import sm08 from '../assets/Vanshdeep/social media design/AURA - SM grid-08.jpg'
-import sm09 from '../assets/Vanshdeep/social media design/AURA - SM grid-09.jpg'
+import smPost1 from '../assets/Vanshdeep/Social media/1.png'
+import smPost2 from '../assets/Vanshdeep/Social media/2.png'
+import smPost3 from '../assets/Vanshdeep/Social media/3.png'
+import smPost4 from '../assets/Vanshdeep/Social media/4.png'
+import smPost5 from '../assets/Vanshdeep/Social media/5.png'
+import smPost6 from '../assets/Vanshdeep/Social media/6.png'
+import hrd1 from '../assets/Vanshdeep/Hoarding 1/hoarding 1.jpg'
+import hrd2 from '../assets/Vanshdeep/Hoarding 1/hoarding 2.jpg'
+import hrd3 from '../assets/Vanshdeep/Hoarding 1/hoarding 3.jpg'
+import hrd4 from '../assets/Vanshdeep/Hoarding 1/hoarding 4.jpg'
+import expoCube1 from '../assets/Vanshdeep/expo/cube 1.jpg'
+import expoCube2 from '../assets/Vanshdeep/expo/cube 2.jpg'
+import expoFlags from '../assets/Vanshdeep/expo/event flags2.jpg'
+import expoTent from '../assets/Vanshdeep/expo/tent carf.jpg'
+import priceChartImg from '../assets/Vanshdeep/Price chart.jpg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -52,6 +63,191 @@ function R({ children, className = '', delay = 0 }) {
 const gold = '#B8963E'
 const dark = '#1A1A1A'
 const ivory = '#F5F0E8'
+
+/* ─── LIGHTBOX ─── */
+function Lightbox({ src, onClose }) {
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handleKey)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', handleKey); document.body.style.overflow = '' }
+  }, [onClose])
+
+  return ReactDOM.createPortal(
+    <div
+      className="flex items-center justify-center"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: 'rgba(0,0,0,0.9)' }}
+      onClick={onClose}
+    >
+      <div style={{ position: 'relative', display: 'inline-block' }} onClick={(e) => e.stopPropagation()}>
+        <img
+          src={src}
+          alt=""
+          style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8, display: 'block' }}
+        />
+        <button
+          className="flex items-center justify-center text-white/80 hover:text-white transition-colors cursor-pointer"
+          style={{ position: 'absolute', top: 10, right: 10, zIndex: 10000, width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none' }}
+          onClick={onClose}
+        >
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+            <path d="M2 2L16 16M16 2L2 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
+    </div>,
+    document.body
+  )
+}
+
+/* ─── BEFORE/AFTER COMPARISON SLIDER ─── */
+function BeforeAfterSlider({ before, after }) {
+  const containerRef = useRef(null)
+  const [sliderPos, setSliderPos] = useState(50)
+  const isDragging = useRef(false)
+
+  const updatePosition = (clientX) => {
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = clientX - rect.left
+    const percent = Math.max(0, Math.min(100, (x / rect.width) * 100))
+    setSliderPos(percent)
+  }
+
+  const handleMouseDown = () => { isDragging.current = true }
+  const handleMouseUp = () => { isDragging.current = false }
+  const handleMouseMove = (e) => { if (isDragging.current) updatePosition(e.clientX) }
+  const handleTouchMove = (e) => { updatePosition(e.touches[0].clientX) }
+
+  useEffect(() => {
+    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [])
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative rounded-2xl overflow-hidden cursor-col-resize select-none"
+      onMouseDown={handleMouseDown}
+      onTouchMove={handleTouchMove}
+      style={{ background: '#151515' }}
+    >
+      {/* After image (full) */}
+      <img src={after} alt="After" className="w-full block" draggable={false} />
+
+      {/* Before image (clipped) */}
+      <div
+        className="absolute inset-0 overflow-hidden"
+        style={{ width: `${sliderPos}%` }}
+      >
+        <img
+          src={before}
+          alt="Before"
+          className="block h-full object-cover"
+          style={{ width: containerRef.current ? containerRef.current.offsetWidth : '100%', maxWidth: 'none' }}
+          draggable={false}
+        />
+      </div>
+
+      {/* Slider line */}
+      <div
+        className="absolute top-0 bottom-0 w-0.5"
+        style={{ left: `${sliderPos}%`, background: gold }}
+      >
+        {/* Handle */}
+        <div
+          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ background: gold, left: '50%' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M5 3L2 8L5 13" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M11 3L14 8L11 13" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Labels */}
+      <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] font-500 tracking-wider" style={{ background: 'rgba(0,0,0,0.5)', color: 'rgba(255,255,255,0.7)' }}>BEFORE</div>
+      <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-500 tracking-wider" style={{ background: `${gold}CC`, color: '#fff' }}>AFTER</div>
+    </div>
+  )
+}
+
+/* ─── HOARDING SLIDER ─── */
+function HoardingSlider() {
+  const slides = [
+    { label: 'Hoarding 1', img: hrd1 },
+    { label: 'Hoarding 2', img: hrd2 },
+    { label: 'Hoarding 3', img: hrd3 },
+    { label: 'Hoarding 4', img: hrd4 },
+  ]
+  const total = slides.length
+  const [pos, setPos] = useState(total)
+  const realIndex = ((pos % total) + total) % total
+  const isJumping = useRef(false)
+  const [smooth, setSmooth] = useState(true)
+  const tripled = [...slides, ...slides, ...slides]
+
+  const prev = () => { setSmooth(true); setPos(p => p - 1) }
+  const next = () => { setSmooth(true); setPos(p => p + 1) }
+  const goTo = (i) => { setSmooth(true); setPos(total + i) }
+
+  useEffect(() => {
+    if (pos < 1 || pos >= total * 2 - 1) {
+      const timer = setTimeout(() => {
+        isJumping.current = true
+        setSmooth(false)
+        setPos(total + realIndex)
+        requestAnimationFrame(() => { isJumping.current = false })
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [pos, realIndex, total])
+
+  return (
+    <div>
+      <div className="overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, #1A1A1A 0%, #1A1A1A80 30%, transparent 100%)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, #1A1A1A 0%, #1A1A1A80 30%, transparent 100%)' }} />
+        <motion.div
+          className="flex gap-4"
+          animate={{ x: `calc(-${pos} * (min(700px, 80vw) + 16px) + 50% - min(350px, 40vw))` }}
+          transition={smooth ? { duration: 0.5, ease: [0.25, 1, 0.5, 1] } : { duration: 0 }}
+        >
+          {tripled.map((slide, i) => {
+            const thisReal = i % total
+            const isActive = thisReal === realIndex
+            return (
+              <motion.div
+                key={i}
+                className="shrink-0 rounded-2xl overflow-hidden cursor-pointer"
+                style={{ background: '#151515', width: 'min(700px, 80vw)' }}
+                animate={{ opacity: isActive ? 1 : 0.3, scale: isActive ? 1 : 0.92 }}
+                transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+                onMouseDown={() => goTo(thisReal)}
+              >
+                <img src={slide.img} alt={slide.label} className="w-full object-contain" />
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      </div>
+      <div className="flex items-center justify-center gap-4 mt-5">
+        <button onMouseDown={prev} className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white/80 hover:border-white/25 transition-all">&#8249;</button>
+        <div className="flex gap-2">
+          {slides.map((_, i) => (
+            <button key={i} onMouseDown={() => goTo(i)} className="h-1.5 rounded-full transition-all duration-300"
+              style={{ width: realIndex === i ? 24 : 6, background: realIndex === i ? gold : 'rgba(255,255,255,0.15)' }} />
+          ))}
+        </div>
+        <button onMouseDown={next} className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white/80 hover:border-white/25 transition-all">&#8250;</button>
+      </div>
+    </div>
+  )
+}
 
 /* ─── SECTION LABEL ─── */
 function SectionLabel({ number, text }) {
@@ -110,10 +306,12 @@ function NewspaperSlider() {
 
   return (
     <div className="mt-6">
-      <div className="overflow-hidden">
+      <div className="overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, #1A1A1A 0%, #1A1A1A80 30%, transparent 100%)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, #1A1A1A 0%, #1A1A1A80 30%, transparent 100%)' }} />
         <motion.div
           className="flex gap-4"
-          animate={{ x: `calc(-${pos} * (min(400px, 75vw) + 16px) + 50% - min(200px, 37.5vw))` }}
+          animate={{ x: `calc(-${pos} * (min(300px, 65vw) + 16px) + 50% - min(150px, 32.5vw))` }}
           transition={smooth ? { duration: 0.5, ease: [0.25, 1, 0.5, 1] } : { duration: 0 }}
         >
           {tripled.map((slide, i) => {
@@ -123,7 +321,7 @@ function NewspaperSlider() {
               <motion.div
                 key={i}
                 className="shrink-0 rounded-2xl overflow-hidden cursor-pointer"
-                style={{ background: '#151515', width: 'min(400px, 75vw)' }}
+                style={{ background: '#151515', width: 'min(300px, 65vw)' }}
                 animate={{
                   opacity: isActive ? 1 : 0.3,
                   scale: isActive ? 1 : 0.9,
@@ -156,6 +354,7 @@ function NewspaperSlider() {
 export default function VanshdeepProject() {
   useSmoothScroll()
   useEffect(() => { window.scrollTo(0, 0) }, [])
+  const [lightboxImg, setLightboxImg] = useState(null)
 
   const colors = [
     { name: 'Yellow', hex: '#f6ee1d', text: 'black' },
@@ -166,6 +365,7 @@ export default function VanshdeepProject() {
   return (
     <div className="bg-[#FAFAF8] text-[#1A1A1A]" style={{ fontFamily: "'Google Sans', system-ui, sans-serif" }}>
       <Cursor />
+      {lightboxImg && <Lightbox src={lightboxImg} onClose={() => setLightboxImg(null)} />}
 
       {/* ═══ NAV ═══ */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-5 flex items-center justify-between" style={{ background: 'rgba(250,250,248,0.85)', backdropFilter: 'blur(20px)' }}>
@@ -330,7 +530,7 @@ export default function VanshdeepProject() {
             </div>
           </R>
 
-          <div className="grid md:grid-cols-2 gap-10 items-start">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
             <R>
               <div>
                 <p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-30 mb-8">COLORS</p>
@@ -349,7 +549,7 @@ export default function VanshdeepProject() {
               <div>
                 <p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-30 mb-8">LOGO</p>
                 <div className="flex items-center justify-center">
-                  <img src={logoImg} alt="Vanshdeep Group Logo" className="max-h-[160px] object-contain" />
+                  <img src={logoImg} alt="Vanshdeep Group Logo" className="max-h-[240px] object-contain" />
                 </div>
               </div>
             </R>
@@ -357,32 +557,24 @@ export default function VanshdeepProject() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════
-           VISUAL DIRECTION — before/after
-      ═══════════════════════════════════════════ */}
-      <section className="py-20 md:py-28" style={{ background: dark, color: ivory }}>
-        <div className="max-w-6xl mx-auto px-6 md:px-10">
-          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-20 mb-8">VISUAL DIRECTION</p></R>
-          <div className="grid md:grid-cols-2 gap-6">
-            <R>
-              <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
-                <img src={beforeImg} alt="Before" className="w-full object-contain" />
-                <div className="px-5 py-4 border-t border-white/[0.04]">
-                  <p className="text-xs opacity-25">Inconsistent — no visual thread</p>
-                </div>
-              </div>
-            </R>
-            <R delay={0.1}>
-              <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${gold}20` }}>
-                <img src={afterImg} alt="After" className="w-full object-contain" />
-                <div className="px-5 py-4 border-t" style={{ borderColor: `${gold}15` }}>
-                  <p className="text-xs opacity-25">Unified design system applied</p>
-                </div>
-              </div>
-            </R>
+      {/* ═══ BRAND COLLATERAL ═══ */}
+      <section style={{ background: dark }} className="py-8 md:py-12">
+        <div className="max-w-[1000px] mx-auto px-6 md:px-10">
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-4" style={{ color: `${gold}50` }}>BRAND COLLATERAL</p></R>
+          <div className="grid grid-cols-3 gap-3 md:gap-4">
+            <R><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
+              <img src={visitingCardImg} alt="Visiting Card" className="w-full object-contain" />
+            </div></R>
+            <R delay={0.06}><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
+              <img src={bagImg} alt="Bag" className="w-full object-contain" />
+            </div></R>
+            <R delay={0.12}><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
+              <img src={priceChartImg} alt="Price Chart" className="w-full object-contain" />
+            </div></R>
           </div>
         </div>
       </section>
+
 
       {/* ═══════════════════════════════════════════
            THE SOLUTION — 3 cards in one row
@@ -396,25 +588,10 @@ export default function VanshdeepProject() {
             </h2>
           </R>
           <R delay={0.1}>
-            <p className="text-sm leading-relaxed opacity-40 max-w-xl mb-16">
+            <p className="text-sm leading-relaxed opacity-40 max-w-xl">
               We created a comprehensive visual language — defining typography, color, grids, spacing, and reusable components — so every touchpoint speaks the same language.
             </p>
           </R>
-
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { title: 'Unified Layout System', desc: 'Structured grid templates that adapt from newspaper columns to hoarding formats.' },
-              { title: 'Typography Hierarchy', desc: 'Clear heading, subheading, body, and caption scales for instant readability at any size.' },
-              { title: 'Defined Color Palette', desc: 'A restrained, premium palette anchored in charcoal, ivory, and subtle gold.' },
-            ].map((c, i) => (
-              <R key={i} delay={i * 0.06}>
-                <div className="p-6 md:p-8 border border-black/[0.06] rounded-xl hover:border-black/[0.12] transition-colors duration-300">
-                  <h4 className="text-sm font-600 mb-2">{c.title}</h4>
-                  <p className="text-xs leading-relaxed opacity-40">{c.desc}</p>
-                </div>
-              </R>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -432,50 +609,39 @@ export default function VanshdeepProject() {
       </section>
 
       {/* ═══ MOCKUPS — Hoardings ═══ */}
-      <section style={{ background: dark }} className="py-4">
-        <div className="max-w-[1000px] mx-auto px-4 md:px-6">
-          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-4 px-1" style={{ color: `${gold}50` }}>HOARDINGS</p></R>
-          <R><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-            <img src={hoardingImg} alt="Hoarding Design" className="w-full object-contain" />
-          </div></R>
+      <section style={{ background: dark }} className="py-6 md:py-8">
+        <div className="max-w-[1000px] mx-auto px-6 md:px-10">
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-4" style={{ color: `${gold}50` }}>HOARDINGS</p></R>
+          <HoardingSlider />
         </div>
       </section>
 
       {/* ═══ MOCKUPS — Expo ═══ */}
-      <section style={{ background: dark }} className="py-4">
-        <div className="max-w-[1000px] mx-auto px-4 md:px-6">
-          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-4 px-1" style={{ color: `${gold}50` }}>EXPO PANELS</p></R>
-          <R><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-            <div className="aspect-[16/9] flex items-center justify-center">
-              <p className="text-white/10 text-xs">Expo Booth — Full Setup</p>
-            </div>
-          </div></R>
-          <div className="grid md:grid-cols-3 gap-4 mt-4">
-            <R><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-              <div className="aspect-[16/9] flex items-center justify-center">
-                <p className="text-white/10 text-xs">Panel 1</p>
-              </div>
-            </div></R>
-            <R delay={0.06}><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-              <div className="aspect-[16/9] flex items-center justify-center">
-                <p className="text-white/10 text-xs">Panel 2</p>
-              </div>
-            </div></R>
-            <R delay={0.12}><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-              <div className="aspect-[16/9] flex items-center justify-center">
-                <p className="text-white/10 text-xs">Panel 3</p>
-              </div>
-            </div></R>
+      <section style={{ background: dark }} className="py-6 md:py-8">
+        <div className="max-w-[1000px] mx-auto px-6 md:px-10">
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-4" style={{ color: `${gold}50` }}>EXPO</p></R>
+          <div className="grid grid-cols-4 gap-2 md:gap-3">
+            {[expoFlags, expoCube1, expoCube2, expoTent].map((img, i) => (
+              <R key={i} delay={i * 0.05}>
+                <div
+                  className="rounded-xl overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105"
+                  style={{ background: '#151515' }}
+                  onClick={() => setLightboxImg(img)}
+                >
+                  <img src={img} alt={`Expo ${i + 1}`} className="w-full object-cover" />
+                </div>
+              </R>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ═══ MOCKUPS — Social Media (Insta Grid) ═══ */}
-      <section style={{ background: dark }} className="py-4">
-        <div className="max-w-[1000px] mx-auto px-4 md:px-6">
-          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-4 px-1" style={{ color: `${gold}50` }}>SOCIAL MEDIA</p></R>
-          <div className="grid grid-cols-4 gap-2">
-            {[sm06, sm07, sm08, sm09].map((img, i) => (
+      <section style={{ background: dark }} className="py-8 md:py-12">
+        <div className="max-w-[800px] mx-auto px-6 md:px-10">
+          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-6 md:mb-8" style={{ color: `${gold}50` }}>SOCIAL MEDIA</p></R>
+          <div className="grid grid-cols-3 gap-3 md:gap-4">
+            {[smPost1, smPost2, smPost3, smPost4, smPost5, smPost6].map((img, i) => (
               <R key={i} delay={i * 0.06}><div className="rounded-xl overflow-hidden" style={{ background: '#151515' }}>
                 <img src={img} alt={`Social Media ${i + 1}`} className="w-full object-contain" />
               </div></R>
@@ -484,26 +650,6 @@ export default function VanshdeepProject() {
         </div>
       </section>
 
-      {/* ═══ MOCKUPS — Brand Collateral ═══ */}
-      <section style={{ background: dark }} className="py-4 pb-16">
-        <div className="max-w-[1000px] mx-auto px-4 md:px-6">
-          <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-4 px-1" style={{ color: `${gold}50` }}>BRAND COLLATERAL</p></R>
-          <div className="grid md:grid-cols-2 gap-4 mb-4">
-            <R><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-              <img src={visitingCardImg} alt="Visiting Card" className="w-full object-contain" />
-            </div></R>
-            <R delay={0.08}><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-              <img src={bagImg} alt="Bag" className="w-full object-contain" />
-            </div></R>
-          </div>
-          {/* Final full-width spread */}
-          <R><div className="rounded-2xl overflow-hidden" style={{ background: '#151515' }}>
-            <div className="aspect-[16/9] flex items-center justify-center">
-              <p className="text-white/10 text-xs">Full Brand Spread — All Formats Together</p>
-            </div>
-          </div></R>
-        </div>
-      </section>
 
 
       {/* ═══════════════════════════════════════════

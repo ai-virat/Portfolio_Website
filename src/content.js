@@ -56,8 +56,8 @@ export const stats = [
 export const works = [
   { title: 'Vanshdeep Group — Branding', bg: 'linear-gradient(135deg,#1A1A1A,#3a3a3a)', link: '/project/vanshdeep', thumb: 'vanshdeep' },
   { title: 'Cloudy Sharks — Social Media', bg: 'linear-gradient(135deg,#7CB9E8,#B8D8F0)', link: '/project/cloudy-sharks', thumb: 'cloudysharks' },
-  { title: 'Social Media Redesign', bg: 'linear-gradient(135deg,#4facfe,#00f2fe)' },
-  { title: 'Packaging Design System', bg: 'linear-gradient(135deg,#43e97b,#38f9d7)' },
+  { title: 'Oswal Soap — Campaign Design', bg: '#FFFFFF', link: '/project/oswal-soap', thumb: 'oswal' },
+  { title: 'Rajasthan Royals — Jersey Design', bg: 'linear-gradient(135deg,#E91E8C,#2D1B69)', link: '/project/rajasthan-royals', thumb: 'rr' },
 ]
 
 // ─── QUOTES SECTION ───

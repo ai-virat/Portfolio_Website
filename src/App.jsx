@@ -15,6 +15,8 @@ import presentImg from './assets/present.jpg'
 import { hero, craft, tools, aiTools, career, stats, works, quoteSection, floatingQuotes, shayari, dreams, playlist, testimonials as testimonialData, gallery, footer } from './content'
 import vanshdeepThumb from './assets/Vanshdeep logo.jpg'
 import sharkThumb from './assets/Shark Slide/SharkLogo.svg'
+import oswalThumb from './assets/Oswal/oswal-logo.png'
+import rrThumb from './assets/Rajasthan Royals/Final/1.png'
 
 // Brand logos
 const logoModules = import.meta.glob('./assets/logos/*.svg', { eager: true, query: '?url', import: 'default' })
@@ -621,7 +623,7 @@ export default function App() {
       <section className="py-24 bg-[var(--color-light)] text-[var(--color-dark)]">
         <div className="max-w-6xl mx-auto px-10">
           <R><h2 className="text-xl font-600 mb-10">SELECTED WORKS</h2></R>
-          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+          <div className="grid grid-cols-4 gap-4 max-md:grid-cols-2">
             {works.map((p, i) => (
               <R key={i} delay={i * 0.05}>
                 {p.link ? (
@@ -633,6 +635,8 @@ export default function App() {
                     <div className="aspect-[4/3] transition-transform duration-700 group-hover:scale-105 relative" style={{ background: p.bg }}>
                       {p.thumb === 'vanshdeep' && <img src={vanshdeepThumb} alt="" className="absolute inset-0 w-full h-full object-cover" />}
                       {p.thumb === 'cloudysharks' && <img src={sharkThumb} alt="" className="absolute inset-0 w-full h-full object-contain p-10" />}
+                      {p.thumb === 'oswal' && <img src={oswalThumb} alt="" className="absolute inset-0 w-full h-full object-contain p-10" />}
+                      {p.thumb === 'rr' && <img src={rrThumb} alt="" className="absolute inset-0 w-full h-full object-cover" />}
                     </div>
                     <div className="p-4 bg-white"><h3 className="font-500 text-sm">{p.title}</h3></div>
                   </div>
