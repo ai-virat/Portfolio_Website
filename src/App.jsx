@@ -17,6 +17,36 @@ import vanshdeepThumb from './assets/Vanshdeep logo.jpg'
 import sharkThumb from './assets/Shark Slide/SharkLogo.svg'
 import oswalThumb from './assets/Oswal/oswal-logo.png'
 import rrThumb from './assets/Rajasthan Royals/Final/1.png'
+import pImg1 from './assets/Personal images/IMG_4740.jpg'
+import pImg2 from './assets/Personal images/IMG_9875.JPG'
+import pImg3 from './assets/Personal images/IMG_6600.jpg'
+import pImg4 from './assets/Personal images/IMG_5181.jpg'
+import pImg5 from './assets/Personal images/IMG_6769.jpg'
+import pImg6 from './assets/Personal images/IMG_0323.JPG'
+import pImg7 from './assets/Personal images/IMG_6628.JPG'
+import pImg8 from './assets/Personal images/IMG_9403.JPG'
+import pImg9 from './assets/Personal images/IMG_1093.JPG'
+import pImg10 from './assets/Personal images/IMG_0427.JPG'
+import pImg11 from './assets/Personal images/IMG_6278.jpg'
+import pImg12 from './assets/Personal images/DSC04139.JPG'
+import pImg13 from './assets/Personal images/IMG_6282.JPG'
+import pImg14 from './assets/Personal images/IMG_9876.JPG'
+import pImg15 from './assets/Personal images/DSC04160.JPG'
+import pImg16 from './assets/Personal images/IMG_5707.JPG'
+import pImg17 from './assets/Personal images/IMG_6777.jpg'
+import pImg18 from './assets/Personal images/IMG_0268 2.jpg'
+import pImg19 from './assets/Personal images/IMG_5705.JPG'
+import pImg20 from './assets/Personal images/IMG_9119.JPG'
+import pImg21 from './assets/Personal images/IMG_6613.jpg'
+import pImg22 from './assets/Personal images/DSC04168.JPG'
+import pImg23 from './assets/Personal images/IMG_4993.JPG'
+import pImg24 from './assets/Personal images/IMG_0141.JPG'
+import pImg25 from './assets/Personal images/IMG_6771.jpg'
+import pImg26 from './assets/Personal images/DSC04174.JPG'
+import pImg27 from './assets/Personal images/IMG_5211.jpg'
+import pImg28 from './assets/Personal images/DSC04162.JPG'
+import pImg29 from './assets/Personal images/IMG_9874.JPG'
+import pImg30 from './assets/Personal images/IMG_0558.JPG'
 import aiClaude from './assets/AI tool logo/claude.svg'
 import aiChatGPT from './assets/AI tool logo/chat gpt.svg'
 import aiGemini from './assets/AI tool logo/gemini.svg'
@@ -185,58 +215,56 @@ function CraftSection() {
 
 /* ═══ TOOLS — from content.js ═══ */
 
-/* ═══ THINGS I BELIEVE IN — flowing marquee ═══ */
-function FloatingQuotesSection() {
-  const shers = shayari
-  const row1 = shers.filter((_, i) => i % 2 === 0)
-  const row2 = shers.filter((_, i) => i % 2 === 1)
+/* ═══ THINGS I BELIEVE IN ═══ */
+const flyXs = [-300, 400, -250, 350, -400, 300, -350, 250, -200, 450]
+const flyYs = [-200, 150, 250, -180, 200, -250, 180, -150, 300, -200]
+const flyRs = [-25, 20, -15, 30, -20, 18, -28, 15, -12, 22]
+const landRs = [-3, 2, -1.5, 2.5, -2, 1.5, -2.5, 1, -1, 2]
 
-  const Card = ({ s }) => (
-    <motion.div
-      className="hover-target group relative shrink-0 p-6 md:p-8 rounded-2xl border border-white/[0.04] overflow-hidden cursor-default w-[300px] md:w-[360px]"
-      whileHover={{ y: -6, scale: 1.03 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute top-4 left-4 text-5xl font-700 opacity-[0.03] select-none">"</div>
-      <p className="font-300 leading-relaxed opacity-30 group-hover:opacity-60 transition-opacity duration-500 relative z-10 whitespace-pre-line" style={{ fontSize: '12px' }}>{s.text}</p>
-      {s.author && <p className="font-400 opacity-15 mt-4 relative z-10" style={{ fontSize: '12px' }}>{s.author}</p>}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--color-blue)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-    </motion.div>
-  )
-
-  const MarqueeRow = ({ items, direction = 'left', duration = 40 }) => {
-    const doubled = [...items, ...items]
-    return (
-      <div className="overflow-hidden relative">
-        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, #060a12 0%, transparent 100%)' }} />
-        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, #060a12 0%, transparent 100%)' }} />
-        <motion.div
-          className="flex gap-4"
-          animate={{ x: direction === 'left' ? [0, '-50%'] : ['-50%', 0] }}
-          transition={{ duration, repeat: Infinity, ease: 'linear' }}
-        >
-          {doubled.map((s, i) => <Card key={i} s={s} />)}
-        </motion.div>
-      </div>
-    )
-  }
+function QuoteCard({ text, author, accent, index }) {
+  const ref = useRef(null)
+  const v = useInView(ref, { once: true, margin: '-40px' })
+  const fx = flyXs[index % 10], fy = flyYs[index % 10], fr = flyRs[index % 10], lr = landRs[index % 10]
 
   return (
-    <section className="relative overflow-hidden py-24" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #060a12 100%)' }}>
+    <motion.div
+      ref={ref}
+      className="hover-target group relative p-5 md:p-6 rounded-2xl border border-white/[0.04] overflow-hidden cursor-default"
+      initial={{ opacity: 0, x: fx, y: fy, rotate: fr, scale: 0.5, filter: 'blur(12px)' }}
+      animate={v ? { opacity: 1, x: 0, y: 0, rotate: lr, scale: 1, filter: 'blur(0px)' } : {}}
+      transition={{ duration: 1.2, delay: index * 0.07, type: 'spring', stiffness: 45, damping: 13 }}
+      whileHover={{ y: -10, rotate: 0, scale: 1.05, zIndex: 30, transition: { type: 'spring', stiffness: 300, damping: 18 } }}
+    >
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `radial-gradient(circle at top left, ${accent}12, transparent 60%)` }} />
+      <div className="absolute top-3 left-3 text-4xl font-700 opacity-[0.03] select-none">"</div>
+      <div className="w-1.5 h-1.5 rounded-full mb-2.5 opacity-50" style={{ background: accent }} />
+      <p className="font-300 leading-relaxed opacity-30 group-hover:opacity-65 transition-opacity duration-500 relative z-10 whitespace-pre-line" style={{ fontSize: '11px' }}>{text}</p>
+      {author && <p className="font-400 opacity-15 mt-3 group-hover:opacity-30 transition-opacity duration-500 relative z-10" style={{ fontSize: '10px' }}>{author}</p>}
+      <div className="absolute bottom-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(to right, transparent, ${accent}30, transparent)` }} />
+    </motion.div>
+  )
+}
+
+function FloatingQuotesSection() {
+  const accents = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#E91E8C', '#6366F1', '#14B8A6', '#F97316', '#EC4899']
+  const allCards = shayari.map((s, i) => ({ text: s.text, author: s.author, accent: accents[i % accents.length] }))
+
+  return (
+    <section className="relative overflow-x-clip py-24" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #060a12 50%, #0a0a0a 100%)' }}>
       <div className="absolute inset-0">
-        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #3B82F6, transparent 70%)' }} />
-        <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full opacity-[0.02]" style={{ background: 'radial-gradient(circle, #8B5CF6, transparent 70%)' }} />
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full opacity-[0.025]" style={{ background: 'radial-gradient(circle, #3B82F6, transparent 70%)' }} />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.02]" style={{ background: 'radial-gradient(circle, #8B5CF6, transparent 70%)' }} />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pb-10 text-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pb-12 text-center">
         <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-15 mb-3">THINGS I BELIEVE IN</p></R>
         <R delay={0.05}><p className="text-xs opacity-10 mb-6">quotes, shers, and borrowed wisdom.</p></R>
       </div>
 
-      <div className="relative z-10 space-y-4">
-        <MarqueeRow items={row1} direction="left" duration={45} />
-        <MarqueeRow items={row2} direction="right" duration={50} />
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-2 md:grid-cols-5 gap-3">
+        {allCards.map((card, i) => (
+          <QuoteCard key={i} text={card.text} author={card.author} accent={card.accent} index={i} />
+        ))}
       </div>
     </section>
   )
@@ -625,21 +653,21 @@ export default function App() {
       <section className="relative overflow-hidden py-28" style={{ background: 'linear-gradient(180deg,#060a12,#0c1018 50%,#0a0a0a 100%)' }}>
         <div className="absolute inset-0 pointer-events-none animate-pulse opacity-60" style={{ background: 'radial-gradient(1px at 8% 15%,rgba(59,130,246,.4),transparent),radial-gradient(1px at 25% 8%,rgba(255,255,255,.25),transparent),radial-gradient(1.5px at 45% 12%,rgba(59,130,246,.3),transparent),radial-gradient(1px at 65% 20%,rgba(255,255,255,.2),transparent),radial-gradient(1px at 88% 5%,rgba(59,130,246,.25),transparent),radial-gradient(1px at 12% 40%,rgba(255,255,255,.15),transparent),radial-gradient(1.5px at 38% 50%,rgba(59,130,246,.3),transparent),radial-gradient(1px at 58% 35%,rgba(255,255,255,.2),transparent),radial-gradient(1px at 50% 72%,rgba(59,130,246,.25),transparent)', animationDuration: '4s' }} />
         <div className="relative z-10 max-w-4xl mx-auto px-10 text-center">
-          <R><h2 className="text-2xl md:text-4xl font-700 mb-2" style={{ color: blue }}>THINGS I WILL DO.</h2></R>
+          <R><h2 className="text-2xl md:text-4xl font-700 mb-2" style={{ color: blue }}>BEFORE I'M DONE.</h2></R>
           <R delay={0.08}><p className="text-xs opacity-15 mb-14">not a bucket list. a promise to myself.</p></R>
           <div className="space-y-3 max-w-xl mx-auto text-left">
             {dreams.map((d, i) => (
               <R key={i} delay={i * 0.05}>
                 <motion.div
                   className="group flex items-center gap-4 px-6 py-4 rounded-2xl border border-white/[0.03] relative overflow-hidden cursor-default"
-                  whileHover={{ x: 10, scale: 1.01, borderColor: 'rgba(59,130,246,0.15)' }}
+                  whileHover={{ x: 10, scale: 1.01, borderColor: d.done ? 'rgba(16,185,129,0.15)' : 'rgba(59,130,246,0.15)' }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-blue)]/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="w-5 h-5 rounded-full border border-white/8 flex items-center justify-center shrink-0 relative z-10 group-hover:border-[var(--color-blue)]/25 transition-colors">
-                    <motion.div className="w-1.5 h-1.5 rounded-full" style={{ background: blue }} initial={{ scale: 0 }} whileHover={{ scale: 1 }} />
+                  <div className="w-5 h-5 rounded-full border flex items-center justify-center shrink-0 relative z-10 transition-colors" style={{ borderColor: d.done ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.08)' }}>
+                    {d.done && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </div>
-                  <span className="text-sm font-400 relative z-10 opacity-60 group-hover:opacity-100 transition-opacity">{d}</span>
+                  <span className={`text-sm font-400 relative z-10 transition-opacity ${d.done ? 'opacity-40 line-through' : 'opacity-60 group-hover:opacity-100'}`}>{d.text}</span>
                 </motion.div>
               </R>
             ))}
@@ -648,44 +676,62 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ 13. OFF SCREEN — with motion ═══ */}
-      <section className="py-24 bg-[var(--color-light)] text-[var(--color-dark)]">
+      {/* ═══ 13. OFF SCREEN — cluttered photo dump ═══ */}
+      <style>{`.photo-card{transition:transform 0.4s cubic-bezier(0.25,1,0.5,1),box-shadow 0.3s ease;will-change:transform;backface-visibility:hidden}.photo-card:hover{transform:rotate(0deg) scale(1.15)!important;z-index:30!important;box-shadow:0 20px 40px rgba(0,0,0,0.3)}`}</style>
+      <section className="py-24 bg-[var(--color-light)] text-[var(--color-dark)] overflow-hidden">
         <div className="max-w-6xl mx-auto px-10">
-          <R><h2 className="text-xl font-600 mb-10">OFF SCREEN.</h2></R>
-          <div className="grid grid-cols-3 gap-3 auto-rows-[220px] max-md:grid-cols-2 max-md:auto-rows-[180px]">
-            {gallery.map((g, i) => {
-              const directions = [
-                { x: -60, y: 40, rotate: -3 },
-                { x: 60, y: 30, rotate: 2 },
-                { x: -40, y: 50, rotate: -2 },
-                { x: 50, y: 40, rotate: 3 },
-                { x: -50, y: 35, rotate: -1 },
-                { x: 40, y: 45, rotate: 2 },
-              ]
-              const d = directions[i]
-              return (
-              <motion.div
+          <R><h2 className="text-xl font-600 mb-14">OFF SCREEN.</h2></R>
+          <div className="relative hidden md:block" style={{ height: '1050px', contain: 'layout style paint' }}>
+            {[
+              { img: pImg4, top: '0%', left: '2%', w: 150, r: -8, z: 3 },
+              { img: pImg12, top: '-1%', left: '20%', w: 190, r: 3, z: 8 },
+              { img: pImg2, top: '2%', left: '48%', w: 140, r: -5, z: 5 },
+              { img: pImg11, top: '0%', left: '70%', w: 155, r: 7, z: 2 },
+              { img: pImg17, top: '3%', left: '88%', w: 120, r: -9, z: 14 },
+              { img: pImg26, top: '15%', left: '-3%', w: 130, r: -10, z: 2 },
+              { img: pImg3, top: '16%', left: '15%', w: 145, r: 6, z: 6 },
+              { img: pImg1, top: '14%', left: '35%', w: 135, r: -4, z: 9 },
+              { img: pImg6, top: '17%', left: '56%', w: 160, r: 5, z: 4 },
+              { img: pImg18, top: '16%', left: '78%', w: 140, r: 7, z: 8 },
+              { img: pImg10, top: '32%', left: '3%', w: 155, r: -7, z: 7 },
+              { img: pImg22, top: '30%', left: '22%', w: 125, r: 10, z: 4 },
+              { img: pImg9, top: '33%', left: '42%', w: 165, r: -3, z: 10 },
+              { img: pImg5, top: '30%', left: '62%', w: 145, r: 8, z: 1 },
+              { img: pImg28, top: '34%', left: '82%', w: 135, r: -6, z: 11 },
+              { img: pImg8, top: '50%', left: '-1%', w: 150, r: -6, z: 11 },
+              { img: pImg14, top: '48%', left: '18%', w: 140, r: 4, z: 3 },
+              { img: pImg29, top: '50%', left: '38%', w: 155, r: -8, z: 12 },
+              { img: pImg15, top: '48%', left: '58%', w: 145, r: 6, z: 13 },
+              { img: pImg30, top: '52%', left: '78%', w: 135, r: -5, z: 5 },
+              { img: pImg7, top: '66%', left: '5%', w: 155, r: 5, z: 12 },
+              { img: pImg13, top: '68%', left: '25%', w: 165, r: -8, z: 2 },
+              { img: pImg21, top: '65%', left: '48%', w: 145, r: -7, z: 15 },
+              { img: pImg16, top: '67%', left: '70%', w: 140, r: -5, z: 5 },
+              { img: pImg27, top: '66%', left: '88%', w: 120, r: 9, z: 6 },
+              { img: pImg20, top: '82%', left: '0%', w: 135, r: 8, z: 9 },
+              { img: pImg23, top: '83%', left: '18%', w: 150, r: -6, z: 10 },
+              { img: pImg19, top: '80%', left: '38%', w: 145, r: -4, z: 6 },
+              { img: pImg24, top: '84%', left: '58%', w: 130, r: 5, z: 7 },
+              { img: pImg25, top: '82%', left: '78%', w: 145, r: -8, z: 13 },
+            ].map((p, i) => (
+              <div
                 key={i}
-                className={`group overflow-hidden rounded-xl relative ${g.cls || ''}`}
-                initial={{ opacity: 0, x: d.x, y: d.y, rotate: d.rotate, scale: 0.9 }}
-                whileInView={{ opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.7, delay: i * 0.08, ease: [0.25, 1, 0.5, 1] }}
+                className="absolute photo-card rounded-lg overflow-hidden shadow-lg cursor-default"
+                style={{ top: p.top, left: p.left, width: p.w, zIndex: p.z, transform: `rotate(${p.r}deg)`, border: '3px solid white', contain: 'layout style paint' }}
               >
-                <motion.div
-                  className="w-full h-full flex items-center justify-center text-sm opacity-15 bg-[var(--color-dark)] text-[var(--color-light)]"
-                  whileHover={{ scale: 1.08 }}
-                  transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                >{g.label}</motion.div>
-                <motion.p
-                  className="absolute bottom-0 inset-x-0 p-3 text-xs bg-gradient-to-t from-black/70 to-transparent text-white"
-                  initial={{ y: '100%' }}
-                  whileHover={{ y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >{g.caption}</motion.p>
-              </motion.div>
-              )
-            })}
+                <img src={p.img} alt="" className="w-full aspect-[4/5] object-cover object-top" loading="lazy" decoding="async" />
+              </div>
+            ))}
+          </div>
+          {/* Mobile: messy grid */}
+          <div className="md:hidden grid grid-cols-3 gap-2">
+            {[pImg4, pImg12, pImg2, pImg11, pImg3, pImg1, pImg6, pImg10, pImg9, pImg5, pImg8, pImg14, pImg15, pImg21, pImg22, pImg29, pImg27, pImg28].map((img, i) => (
+              <R key={i} delay={i * 0.03}>
+                <div className="rounded-lg overflow-hidden" style={{ border: '3px solid white', transform: `rotate(${[-5, 3, -3, 6, -4, 2, -6, 4, -2, 5, -3, 7, -4, 6, -5, 3, -7, 8][i]}deg)` }}>
+                  <img src={img} alt="" className="w-full aspect-square object-cover object-top" loading="lazy" />
+                </div>
+              </R>
+            ))}
           </div>
         </div>
       </section>

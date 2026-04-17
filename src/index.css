@@ -26,7 +26,8 @@
   --color-dark2: #111111;
 }
 
-html { scroll-behavior: auto; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+img { content-visibility: auto; }
 body { margin: 0; font-family: var(--font-main); background: var(--color-dark); color: #f5f5f5; overflow-x: hidden; }
 @media (hover: hover) { *, *::before, *::after { cursor: none !important; } }
 @media (hover: none) { body { cursor: auto; } a, button { cursor: auto; } }
