@@ -24,7 +24,6 @@ export const tools = [
   { name: 'Illustrator', abbr: 'Ai', color: '#FF9A00' },
   { name: 'After Effects', abbr: 'Ae', color: '#9999FF' },
   { name: 'Premiere Pro', abbr: 'Pr', color: '#9999FF' },
-  { name: 'Figma', abbr: 'Fg', color: '#A259FF' },
   { name: 'InDesign', abbr: 'Id', color: '#FF3366' },
 ]
 
@@ -80,9 +79,16 @@ export const floatingQuotes = [
 
 // ─── SHAYARI ───
 export const shayari = [
-  { text: 'ख्वाब तो आँखों में है अब भी\nफिर भी उनकी ताबीरों से दिल डरता है\n\nथके हुए पल, डरे हुए दिल, दुखी हुई आँखों से कह दो\nऔर कोई अब ख्वाब ना देखें', author: '— अशफ़ाक़ हुसैन' },
-  { text: 'दिन कुछ ऐसे गुज़ारता है कोई\nजैसे एहसाँ उतारता है कोई\n\nआइना देख कर तसल्ली हुई\nहम को इस घर में जानता है कोई', author: '— गुलज़ार' },
-  { text: 'One more — because good things come in threes. Your voice, your ink, your fire.', author: null },
+  { text: 'ख्वाब ही ख़्वाब है मेरे रातों में,\nनींद फिर क्यों नहीं है रातों में,\n\nतुझे ग़ैरों से बात करते देखर सोचता हूँ\nक्या कमी रह गई थी ? मेरी महोब्बत में', author: '— विराट सिंह' },
+  { text: 'सात दरियाओं का बोह है जैसे,\nहकीम को इलाज पर लानत है जैसे\n\nआदमी और सुधार जाये? वो भला कैसे?\nखून थूक कर चाटते है, भेड़िये जैसे', author: '— विराट सिंह' },
+  { text: 'The loudest people in the room are\noften the ones selling noise.', author: null },
+  { text: 'मरीज-ए-इश्क़ पर रहमत खुदा की\nबढ़ता गया मर्ज़, जब जब दवा की।', author: null },
+  { text: 'रंग सारे जंचते हैं उस पर\nपर जो लगती है आसमानी में..\nपांव दरिया में डाल कर बोली\nऐसे लगती है आग पानी में....', author: '— अज्ञात' },
+  { text: 'देखता क्या है इन पहाड़ों को, जो नितांत खड़े रहेंगे तेरे बाद भी, उम्र के उस पड़ाव के बाद भी जब तुम इसे सिर्फ़ देखना पसंद करोगे, चढ़ना नही।', author: null },
+  { text: 'मेरे तन के ज़ख़्म ना गिन अभी,\nमेरी आँख में अभी नूर है\n\nमेरी बाज़ुओं पे निगाह कर,\nजो ग़ुरूर था वो ग़ुरूर है', author: '— अहमद फ़राज़' },
+  { text: 'युद्ध नहीं जिनके जीवन में\nवे भी बहुत अभागे होंगे\nया तो प्रण को तोड़ा होगा\nया फिर रण से भागे होंगे', author: '— अर्जुन सिसोदिया' },
+  { text: 'World will ask you who you are?\nAnd if you don\'t know,\nthan the world will tell you who you are.', author: null },
+  { text: 'क्लैब्यं मा स्म गमः पार्थ\nनैतत्त्वय्युपपद्यते।', author: '— श्रीमद्भगवद्गीता' },
 ]
 
 // ─── DREAMS / BUCKET LIST ───

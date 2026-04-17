@@ -26,3 +26,9 @@ dist-ssr
 *.prproj
 *.prin
 .vercel
+src/assets/Personal images/
+src/assets/Rajasthan Royals/do not use/
+*.heic
+*.MOV
+*.MP4
+src/assets/Oswal/front page

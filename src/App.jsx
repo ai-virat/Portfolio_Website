@@ -17,6 +17,10 @@ import vanshdeepThumb from './assets/Vanshdeep logo.jpg'
 import sharkThumb from './assets/Shark Slide/SharkLogo.svg'
 import oswalThumb from './assets/Oswal/oswal-logo.png'
 import rrThumb from './assets/Rajasthan Royals/Final/1.png'
+import aiClaude from './assets/AI tool logo/claude.svg'
+import aiChatGPT from './assets/AI tool logo/chat gpt.svg'
+import aiGemini from './assets/AI tool logo/gemini.svg'
+import aiHiggsfield from './assets/AI tool logo/higgsfield.svg'
 
 // Brand logos
 const logoModules = import.meta.glob('./assets/logos/*.svg', { eager: true, query: '?url', import: 'default' })
@@ -181,111 +185,60 @@ function CraftSection() {
 
 /* ═══ TOOLS — from content.js ═══ */
 
-/* ═══ FLOATING SCATTERED QUOTES ═══ */
+/* ═══ THINGS I BELIEVE IN — flowing marquee ═══ */
 function FloatingQuotesSection() {
-  const ref = useRef(null), v = useInView(ref, { once: true, margin: '-50px' })
+  const shers = shayari
+  const row1 = shers.filter((_, i) => i % 2 === 0)
+  const row2 = shers.filter((_, i) => i % 2 === 1)
 
-  const cards = floatingQuotes
+  const Card = ({ s }) => (
+    <motion.div
+      className="hover-target group relative shrink-0 p-6 md:p-8 rounded-2xl border border-white/[0.04] overflow-hidden cursor-default w-[300px] md:w-[360px]"
+      whileHover={{ y: -6, scale: 1.03 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute top-4 left-4 text-5xl font-700 opacity-[0.03] select-none">"</div>
+      <p className="font-300 leading-relaxed opacity-30 group-hover:opacity-60 transition-opacity duration-500 relative z-10 whitespace-pre-line" style={{ fontSize: '12px' }}>{s.text}</p>
+      {s.author && <p className="font-400 opacity-15 mt-4 relative z-10" style={{ fontSize: '12px' }}>{s.author}</p>}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--color-blue)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    </motion.div>
+  )
 
-  // Scattered positions — overlapping, rotated, like dropped cards
-  const layouts = [
-    { top: '5%', left: '2%', rotate: -4, z: 1, w: '340px' },
-    { top: '2%', left: '55%', rotate: 2, z: 3, w: '320px' },
-    { top: '22%', left: '25%', rotate: -1.5, z: 5, w: '350px' },
-    { top: '18%', left: '60%', rotate: 3, z: 2, w: '300px' },
-    { top: '42%', left: '5%', rotate: 1.5, z: 4, w: '330px' },
-    { top: '40%', left: '50%', rotate: -3, z: 6, w: '340px' },
-    { top: '62%', left: '15%', rotate: 2.5, z: 7, w: '320px' },
-    { top: '60%', left: '55%', rotate: -2, z: 8, w: '310px' },
-  ]
+  const MarqueeRow = ({ items, direction = 'left', duration = 40 }) => {
+    const doubled = [...items, ...items]
+    return (
+      <div className="overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, #060a12 0%, transparent 100%)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, #060a12 0%, transparent 100%)' }} />
+        <motion.div
+          className="flex gap-4"
+          animate={{ x: direction === 'left' ? [0, '-50%'] : ['-50%', 0] }}
+          transition={{ duration, repeat: Infinity, ease: 'linear' }}
+        >
+          {doubled.map((s, i) => <Card key={i} s={s} />)}
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
-    <section ref={ref} className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #060a12 100%)' }}>
+    <section className="relative overflow-hidden py-24" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #060a12 100%)' }}>
       <div className="absolute inset-0">
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #3B82F6, transparent 70%)' }} />
         <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full opacity-[0.02]" style={{ background: 'radial-gradient(circle, #8B5CF6, transparent 70%)' }} />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pt-24 pb-10 text-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pb-10 text-center">
         <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-15 mb-3">THINGS I BELIEVE IN</p></R>
         <R delay={0.05}><p className="text-xs opacity-10 mb-6">quotes, shers, and borrowed wisdom.</p></R>
       </div>
 
-      {/* Floating cards — scattered on desktop, stacked on mobile */}
-      {/* Desktop: absolute positioned */}
-      <div className="relative max-w-6xl mx-auto px-10 hidden md:block" style={{ height: '85vh', minHeight: '600px' }}>
-        {cards.map((card, i) => {
-          const l = layouts[i]
-          return (
-            <motion.div
-              key={i}
-              className="absolute group cursor-default"
-              style={{ top: l.top, left: l.left, width: l.w, zIndex: l.z, maxWidth: 'calc(100% - 40px)' }}
-              initial={{ opacity: 0, y: 200, rotate: l.rotate * 3, scale: 0.7 }}
-              whileInView={{ opacity: 1, y: 0, rotate: l.rotate, scale: 1 }}
-              viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.9, delay: i * 0.06, type: 'spring', stiffness: 80, damping: 15 }}
-              whileHover={{ y: -12, rotate: 0, scale: 1.06, zIndex: 20, transition: { type: 'spring', stiffness: 300, damping: 18 } }}
-            >
-              <div className="rounded-2xl p-5 backdrop-blur-sm border border-white/[0.06] shadow-2xl transition-shadow duration-500 group-hover:shadow-[0_25px_70px_rgba(0,0,0,0.5)]"
-                style={{ background: `linear-gradient(135deg, ${card.accent}08, ${card.accent}04)` }}>
-                <div className="w-2 h-2 rounded-full mb-3 opacity-60" style={{ background: card.accent }} />
-                <p className="font-400 leading-relaxed text-white/50 group-hover:text-white/80 transition-colors duration-400" style={{ fontSize: '12px' }}>{card.text}</p>
-                {card.sub && <p className="mt-2 text-white/20 group-hover:text-white/40 transition-colors" style={{ fontSize: '10px' }}>{card.sub}</p>}
-              </div>
-            </motion.div>
-          )
-        })}
-      </div>
-      {/* Mobile: stacked list */}
-      <div className="md:hidden max-w-6xl mx-auto px-6 pb-16 space-y-3">
-        {cards.map((card, i) => (
-          <motion.div
-            key={i}
-            className="group cursor-default"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-10%' }}
-            transition={{ duration: 0.5, delay: i * 0.05 }}
-          >
-            <div className="rounded-2xl p-5 border border-white/[0.06]"
-              style={{ background: `linear-gradient(135deg, ${card.accent}08, ${card.accent}04)` }}>
-              <div className="w-2 h-2 rounded-full mb-3 opacity-60" style={{ background: card.accent }} />
-              <p className="font-400 leading-relaxed text-white/50" style={{ fontSize: '12px' }}>{card.text}</p>
-              {card.sub && <p className="mt-2 text-white/20" style={{ fontSize: '10px' }}>{card.sub}</p>}
-            </div>
-          </motion.div>
-        ))}
+      <div className="relative z-10 space-y-4">
+        <MarqueeRow items={row1} direction="left" duration={45} />
+        <MarqueeRow items={row2} direction="right" duration={50} />
       </div>
     </section>
-  )
-}
-
-/* ═══ SHAYARI ═══ */
-function ShayariSection() {
-  const shers = shayari
-
-  return (
-    <div className="mb-20">
-      <R><p className="text-xs font-500 tracking-[0.2em] mb-8" style={{ color: blue }}>WORDS THAT KEPT ME UP</p></R>
-      <div className="grid md:grid-cols-3 gap-4">
-        {shers.map((s, i) => (
-          <R key={i} delay={i * 0.08}>
-            <motion.div
-              className="hover-target group relative p-8 rounded-2xl border border-white/[0.04] overflow-hidden cursor-default"
-              whileHover={{ y: -6, scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute top-4 left-4 text-5xl font-700 opacity-[0.03] select-none">"</div>
-              <p className="font-300 leading-relaxed opacity-30 group-hover:opacity-60 transition-opacity duration-500 relative z-10 whitespace-pre-line" style={{ fontSize: '12px' }}>{s.text}</p>
-              {s.author && <p className="font-400 opacity-15 mt-4 relative z-10" style={{ fontSize: '12px' }}>{s.author}</p>}
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--color-blue)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </motion.div>
-          </R>
-        ))}
-      </div>
-    </div>
   )
 }
 
@@ -576,7 +529,7 @@ export default function App() {
       <section className="py-24 bg-[var(--color-dark)]">
         <div className="max-w-6xl mx-auto px-10 text-center">
           <R><p className="text-[0.6rem] font-500 tracking-[0.3em] opacity-20 mb-8">WHAT I WORK WITH</p></R>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-14">
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-14 max-w-3xl mx-auto">
             {tools.map((t, i) => (
               <R key={t.name} delay={i * 0.03}>
                 <motion.div className="hover-target group p-5 rounded-xl border border-white/[0.04] text-center transition-colors duration-400 hover:border-white/[0.12] cursor-default"
@@ -589,12 +542,17 @@ export default function App() {
           </div>
           <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-5" style={{ color: blue }}>AI COMPANIONS</p></R>
           <div className="flex flex-wrap gap-3 justify-center">
-            {aiTools.map((t, i) => (
+            {[
+              { name: 'Claude', logo: aiClaude },
+              { name: 'ChatGPT', logo: aiChatGPT },
+              { name: 'Gemini', logo: aiGemini },
+              { name: 'Higgsfield', logo: aiHiggsfield },
+            ].map((t, i) => (
               <R key={t.name} delay={i * 0.03}>
-                <motion.div className="hover-target flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/[0.04] transition-colors duration-300 hover:border-white/[0.12] cursor-default"
+                <motion.div className="hover-target flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.04] transition-colors duration-300 hover:border-white/[0.12] cursor-default"
                   whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
-                  <span className="text-sm">{t.icon}</span>
-                  <span className="text-xs font-400 opacity-40 group-hover:opacity-80">{t.name}</span>
+                  <img src={t.logo} alt={t.name} className="w-6 h-6 object-contain" />
+                  <span className="text-xs font-400 opacity-40">{t.name}</span>
                 </motion.div>
               </R>
             ))}
@@ -735,7 +693,6 @@ export default function App() {
       {/* ═══ 14. SOUL ═══ */}
       <section className="py-24 bg-[var(--color-dark)]">
         <div className="max-w-6xl mx-auto px-10">
-          <ShayariSection />
           <div>
             <R><p className="text-[0.6rem] font-500 tracking-[0.3em] mb-2" style={{ color: blue }}>ON REPEAT 🎧</p></R>
             <R delay={0.05}><p className="text-[0.6rem] opacity-12 mb-5">you can tell a lot about a person by their playlist.</p></R>
@@ -751,8 +708,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ TESTIMONIALS — stacked card carousel ═══ */}
-      <TestimonialSection />
 
       {/* ═══ FOOTER ═══ */}
       <div className="bg-[var(--color-light)] text-[var(--color-dark)] border-t border-black/[0.06] py-6 px-6 md:px-10">

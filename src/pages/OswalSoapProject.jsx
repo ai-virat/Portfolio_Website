@@ -89,7 +89,9 @@ function HoardingSlider() {
 
   return (
     <div>
-      <div className="overflow-hidden">
+      <div className="overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, #0a0a0a 0%, #0a0a0a80 30%, transparent 100%)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, #0a0a0a 0%, #0a0a0a80 30%, transparent 100%)' }} />
         <motion.div
           className="flex gap-4"
           animate={{ x: `calc(-${pos} * (min(700px, 85vw) + 16px) + 50% - min(350px, 42.5vw))` }}
